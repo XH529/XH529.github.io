@@ -1,0 +1,536 @@
+以下是您个人作品展示页面的HTML代码。它采用浅绿色渐变背景，以卡片形式展示三个工业设计作品，适合部署在GitHub Pages上。
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>XH · 工业设计作品集 | 浅绿美学</title>
+    <!-- Google Fonts & Font Awesome 6 (免费CDN) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #daf6ef 0%, #b9e2cf 100%);
+            background-attachment: fixed;
+            color: #1a3a2f;
+            line-height: 1.4;
+            scroll-behavior: smooth;
+        }
+
+        /* 自定义滚动条 增添细腻感 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #cfe6dd;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2c6e49;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1d4f32;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 3rem;
+        }
+
+        /* ----- 头部 / 导航区 (极简轻量) ----- */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(44, 110, 73, 0.2);
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #195a3a, #307e55);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .logo span {
+            font-weight: 400;
+            color: #2c6e49;
+            background: none;
+            -webkit-background-clip: unset;
+            background-clip: unset;
+        }
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            font-weight: 500;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #2a5e42;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+            border-bottom: 2px solid transparent;
+            padding-bottom: 4px;
+        }
+        .nav-links a:hover {
+            color: #164b32;
+            border-bottom-color: #2c6e49;
+        }
+
+        /* Hero 主角区域 */
+        .hero {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 4.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(2px);
+            border-radius: 3rem;
+            padding: 2rem 2rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02);
+        }
+        .hero-content {
+            flex: 1;
+        }
+        .hero-content .badge {
+            display: inline-block;
+            background: #2c6e49d9;
+            backdrop-filter: blur(4px);
+            color: #f5fef9;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+            margin-bottom: 1.2rem;
+        }
+        .hero-content h1 {
+            font-size: 3.2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            color: #164b32;
+        }
+        .hero-content h1 i {
+            font-weight: 500;
+            color: #2c6e49;
+        }
+        .hero-content p {
+            font-size: 1.1rem;
+            color: #1f4d38;
+            max-width: 90%;
+            margin-bottom: 1.8rem;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: #ffffffcc;
+            backdrop-filter: blur(4px);
+            padding: 0.7rem 1.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            color: #215d41;
+            text-decoration: none;
+            transition: 0.2s;
+            border: 1px solid rgba(44, 110, 73, 0.3);
+        }
+        .hero-cta:hover {
+            background: #ffffff;
+            gap: 1.2rem;
+            border-color: #2c6e49;
+            color: #0f3b26;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+        }
+        .hero-sign {
+            flex: 0 0 100px;
+            text-align: center;
+        }
+        .avatar-circle {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(125deg, #e6f7ef, #cbe7dc);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 25px -12px rgba(0,0,0,0.1);
+            border: 3px solid #ffffffaa;
+        }
+        .avatar-circle span {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #256b48;
+            letter-spacing: 2px;
+        }
+
+        /* section 标题 */
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .section-title h2 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #174e34;
+            display: inline-block;
+            background: rgba(255,255,240,0.5);
+            padding: 0 1.5rem;
+            border-radius: 60px;
+            backdrop-filter: blur(2px);
+        }
+        .section-title .sub {
+            color: #286e49;
+            margin-top: 0.5rem;
+            font-weight: 400;
+        }
+
+        /* 作品网格布局 */
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 2.2rem;
+            margin-top: 1rem;
+        }
+
+        /* 卡片样式 */
+        .card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(6px);
+            border-radius: 2rem;
+            overflow: hidden;
+            transition: all 0.35s cubic-bezier(0.2, 0, 0, 1);
+            box-shadow: 0 12px 28px -12px rgba(0, 32, 16, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 25px 35px -14px rgba(30, 70, 50, 0.25);
+            border-color: #cbe3d6;
+        }
+        .card-img {
+            background: linear-gradient(125deg, #d9f0e6, #c2e2d2);
+            padding: 2.5rem 1rem;
+            text-align: center;
+            color: #1d6742;
+            transition: all 0.3s;
+        }
+        .card:hover .card-img {
+            background: linear-gradient(125deg, #ccebde, #b3d9c5);
+        }
+        .card-img i {
+            font-size: 4.2rem;
+            filter: drop-shadow(2px 6px 10px rgba(0,0,0,0.05));
+        }
+        .card-content {
+            padding: 1.6rem 1.8rem 2rem;
+        }
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .tag {
+            background: #e0f0e8;
+            padding: 0.25rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #1b5a3c;
+            letter-spacing: 0.3px;
+        }
+        .card-content h3 {
+            font-size: 1.65rem;
+            font-weight: 600;
+            margin-bottom: 0.6rem;
+            color: #153f2d;
+        }
+        .card-content p {
+            font-size: 0.92rem;
+            color: #2f5a46;
+            line-height: 1.5;
+            margin-bottom: 1.6rem;
+        }
+        .card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #256b48;
+            text-decoration: none;
+            border-bottom: 1.5px solid #b9dbc9;
+            transition: 0.2s;
+        }
+        .card-link i {
+            font-size: 0.75rem;
+            transition: transform 0.2s;
+        }
+        .card-link:hover {
+            color: #0e4a30;
+            border-bottom-color: #256b48;
+            gap: 0.7rem;
+        }
+        .card-link:hover i {
+            transform: translateX(4px);
+        }
+
+        /* 底部区域 */
+        .footer {
+            margin-top: 5rem;
+            padding-top: 2rem;
+            text-align: center;
+            border-top: 1px solid #b4d5c4;
+            color: #2c6046;
+            font-size: 0.85rem;
+        }
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+        .social-links a {
+            color: #2a6a48;
+            font-size: 1.4rem;
+            transition: all 0.2s;
+            background: rgba(255,255,240,0.5);
+            width: 38px;
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            text-decoration: none;
+        }
+        .social-links a:hover {
+            background: #ffffffcc;
+            color: #134b30;
+            transform: translateY(-3px);
+        }
+        .copyright {
+            opacity: 0.8;
+        }
+
+        /* 响应式细节 */
+        @media (max-width: 780px) {
+            .container {
+                padding: 1.2rem 1.2rem 2rem;
+            }
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding: 1.8rem;
+            }
+            .hero-content p {
+                max-width: 100%;
+            }
+            .hero-sign {
+                margin-top: 0.5rem;
+            }
+            .hero-content h1 {
+                font-size: 2.4rem;
+            }
+            .section-title h2 {
+                font-size: 1.8rem;
+            }
+            .works-grid {
+                gap: 1.5rem;
+            }
+            .navbar {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card-content {
+                padding: 1.2rem;
+            }
+            .hero-cta {
+                padding: 0.5rem 1.4rem;
+            }
+        }
+
+        /* 点击锚点平滑 + 焦点展示 */
+        .smooth {
+            scroll-margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 简约头部 含XH标识 -->
+    <div class="navbar">
+        <div class="logo">XH<span> · design studio</span></div>
+        <div class="nav-links">
+            <a href="#works">作品</a>
+            <a href="#about">关于</a>
+            <a href="#contact" style="border-bottom-color: #2c6e49;">联系</a>
+        </div>
+    </div>
+
+    <!-- Hero 我是XH 工业设计师 -->
+    <div class="hero" id="about">
+        <div class="hero-content">
+            <div class="badge"><i class="fas fa-pencil-ruler" style="margin-right: 6px;"></i> Industrial Designer</div>
+            <h1>塑造有温度的<span style="background: linear-gradient(125deg,#1b5a3c,#3f8b62); background-clip: text; -webkit-background-clip: text; color: transparent;"> 工业产品</span></h1>
+            <p>XH — 致力于极简美学与人文体验的工业设计。好的设计让日常泛着光，<br>以下是我精心打造的三件设计作品，每一件都融入对材质、形态与可持续的思考。</p>
+            <a href="#works" class="hero-cta">浏览精选作品 <i class="fas fa-arrow-down"></i></a>
+        </div>
+        <div class="hero-sign">
+            <div class="avatar-circle">
+                <span>XH</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 作品展示区 三个工业设计作品 -->
+    <div class="section-title" id="works">
+        <h2>· 设计作品集 ·</h2>
+        <div class="sub">—— 形式追随功能，理念贯穿细节 ——</div>
+    </div>
+
+    <div class="works-grid">
+        <!-- 作品 1 : 智能人体工学椅 -->
+        <div class="card">
+            <div class="card-img">
+                <i class="fas fa-chair"></i>
+            </div>
+            <div class="card-content">
+                <div class="card-tags">
+                    <span class="tag">人体工学</span>
+                    <span class="tag">透气网面</span>
+                    <span class="tag">2025 红点概念</span>
+                </div>
+                <h3>Aura 智能坐椅</h3>
+                <p>自适应腰部支撑系统 · 动态坐姿跟随 | 3D悬浮扶手与智能阻尼调节，为长时间办公注入轻盈体感。高弹力网布，极致透气，凝聚新一代健康办公哲学。</p>
+                <a href="#" class="card-link">设计解析 <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+
+        <!-- 作品 2 : 模块化磁吸灯具 -->
+        <div class="card">
+            <div class="card-img">
+                <i class="fas fa-lightbulb"></i>
+            </div>
+            <div class="card-content">
+                <div class="card-tags">
+                    <span class="tag">模块化设计</span>
+                    <span class="tag">无极调光</span>
+                    <span class="tag">可持续材质</span>
+                </div>
+                <h3>Lumina 模块灯</h3>
+                <p>灵感来自悬浮星球，磁吸球轴与发光模组自由组合，适应阅读、氛围、工作多种场景。全光谱LED+环保铝材，让光线与空间共舞。</p>
+                <a href="#" class="card-link">设计解析 <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+
+        <!-- 作品 3 : 可持续便携水杯 -->
+        <div class="card">
+            <div class="card-img">
+                <i class="fas fa-mug-hot"></i>
+            </div>
+            <div class="card-content">
+                <div class="card-tags">
+                    <span class="tag">零浪费</span>
+                    <span class="tag">竹木盖</span>
+                    <span class="tag">双层保温</span>
+                </div>
+                <h3>Terra 随行杯</h3>
+                <p>100%可降解材质搭配食品级不锈钢内胆，竹纤维盖与防漏锁扣设计。极简圆柱造型，单手开合，让可持续成为日常优雅习惯。</p>
+                <a href="#" class="card-link">设计解析 <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 小而美的附加介绍，呼应工业设计理念 同时加强个人色彩 -->
+    <div style="margin: 4rem 0 1.5rem; background: rgba(255,255,245,0.4); border-radius: 2rem; padding: 1.5rem; text-align: center; backdrop-filter: blur(2px);">
+        <i class="fas fa-quote-left" style="color: #397e59; opacity: 0.7; margin-right: 8px;"></i>
+        <span style="font-weight: 500; color: #21573e;">设计不是一种技能，而是捕捉事物本质的感觉和洞察。</span>
+        <i class="fas fa-quote-right" style="color: #397e59; opacity: 0.7; margin-left: 8px;"></i>
+        <div style="margin-top: 0.5rem; font-size: 0.85rem; color: #2c6046;">—— XH · 工业设计工作室 ——</div>
+    </div>
+
+    <!-- 简洁联系区 & 底部 (配合社交占位) -->
+    <div class="footer" id="contact">
+        <div class="social-links">
+            <a href="#" aria-label="Behance" target="_blank"><i class="fab fa-behance"></i></a>
+            <a href="#" aria-label="Dribbble" target="_blank"><i class="fab fa-dribbble"></i></a>
+            <a href="#" aria-label="GitHub" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="#" aria-label="Instagram" target="_blank"><i class="fab fa-instagram"></i></a>
+        </div>
+        <div class="copyright">
+            © 2025 XH · 工业设计作品集 | 浅绿渐变灵感 | 开放设计交流
+        </div>
+        <div style="margin-top: 0.8rem; font-size: 0.7rem; opacity: 0.7;">
+            <i class="fas fa-envelope"></i> hello@xh.design  ·  立足当代，构想未来
+        </div>
+    </div>
+</div>
+
+<!-- 简单平滑锚点 避免默认跳转生硬 -->
+<script>
+    (function() {
+        // 让所有带有平滑跳转的锚点更加优雅 (可选)
+        const links = document.querySelectorAll('a[href^="#"]');
+        links.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('href');
+                if (targetId === "#" || targetId === "") return;
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    e.preventDefault();
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    // 添加细微的焦点样式
+                    targetElement.style.transition = "all 0.2s";
+                    targetElement.style.boxShadow = "0 0 0 3px rgba(44,110,73,0.3)";
+                    setTimeout(() => {
+                        targetElement.style.boxShadow = "";
+                    }, 800);
+                }
+            });
+        });
+
+        // 卡片中“设计解析”为示意，无实际跳转，防止冒泡失效但保留占位
+        const demoLinks = document.querySelectorAll('.card-link');
+        demoLinks.forEach(ln => {
+            ln.addEventListener('click', (e) => {
+                if (ln.getAttribute('href') === '#') {
+                    e.preventDefault();
+                    // 弹一个轻提醒 (只是演示交互)
+                    alert('✨ 更多设计细节与渲染图即将上线，欢迎邮件交流 ✨');
+                }
+            });
+        });
+    })();
+</script>
+</body>
+</html>
+```
