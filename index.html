@@ -398,7 +398,7 @@
       height: 100%;
       display: block;
       object-fit: cover;
-      object-position: center top;
+      object-position: center 28%;
       filter: saturate(0.95) contrast(1.02);
     }
 
@@ -546,6 +546,7 @@
     }
 
     .media-main {
+      height: 330px;
       min-height: 330px;
     }
 
@@ -557,8 +558,15 @@
 
     .video-box,
     .link-box {
+      height: 150px;
       min-height: 150px;
       padding: 18px;
+    }
+
+    .video-box .project-video {
+      margin: -18px;
+      width: calc(100% + 36px);
+      height: calc(100% + 36px);
     }
 
     .project-content {
@@ -751,7 +759,7 @@
       <div class="container about-grid">
         <div class="profile-card">
           <div class="avatar-placeholder">
-            <img class="profile-photo" src="profile.jpg" alt="徐浩个人照片">
+            <img class="profile-photo" src="/mnt/data/9d332e5dc427e3865db4f54ef1c6a035.jpg" alt="徐浩个人照片">
           </div>
           <div class="award-list">
             <div class="award-item">“装备中国”高端装备创新设计大赛优秀奖</div>
