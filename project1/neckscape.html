@@ -1,0 +1,2711 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>颈野漫行 Neckscape - HTML键盘试玩版</title>
+  <style>
+    :root {
+      --bg: #10291d;
+      --panel: rgba(18, 38, 28, 0.9);
+      --gold: #ffd36b;
+      --cream: #f4e6bf;
+      --green: #5fbf72;
+      --deep: #0b1b13;
+      --danger: #ff6b6b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, #244d35 0%, #10291d 48%, #07120d 100%);
+      color: var(--cream);
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .game-wrap {
+      position: relative;
+      width: min(100vw, 520px);
+      height: min(100vh, 720px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    canvas {
+      width: 480px;
+      height: 680px;
+      max-width: 100%;
+      max-height: 100%;
+      border: 5px solid #2f5b3e;
+      border-radius: 18px;
+      image-rendering: pixelated;
+      box-shadow: 0 24px 70px rgba(0,0,0,.45), inset 0 0 0 4px rgba(255,255,255,.06);
+      background: #143820;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(3, 11, 7, 0.58);
+      backdrop-filter: blur(3px);
+      border-radius: 18px;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: min(420px, 92%);
+      background: var(--panel);
+      border: 3px solid #6cbf77;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.4);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 34px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-shadow: 3px 3px 0 #6b3e19;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      color: var(--gold);
+    }
+
+    p { line-height: 1.7; margin: 8px 0; }
+
+    .hint {
+      font-size: 14px;
+      color: #d8f0ce;
+      opacity: .92;
+    }
+
+    .keys {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 14px 0;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .key-row {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+
+    kbd {
+      display: inline-block;
+      min-width: 28px;
+      text-align: center;
+      color: #143820;
+      background: var(--gold);
+      border-radius: 6px;
+      padding: 3px 7px;
+      font-weight: 800;
+      margin-right: 5px;
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,.25);
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      background: linear-gradient(#ffe08a, #d79531);
+      color: #40240c;
+      font-size: 18px;
+      font-weight: 800;
+      padding: 12px 24px;
+      border-radius: 999px;
+      box-shadow: 0 7px 0 #7a4416, 0 14px 24px rgba(0,0,0,.24);
+    }
+
+    button:active { transform: translateY(3px); box-shadow: 0 4px 0 #7a4416; }
+
+    .hidden { display: none; }
+
+    .report-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 12px 0;
+      text-align: left;
+    }
+
+    .stat {
+      background: rgba(255,255,255,.08);
+      border-radius: 10px;
+      padding: 9px;
+      font-size: 14px;
+    }
+
+    .score-big {
+      font-size: 42px;
+      font-weight: 900;
+      color: var(--gold);
+      text-shadow: 3px 3px 0 #6b3e19;
+      margin: 6px 0;
+    }
+
+    .camera-panel {
+      position: absolute;
+      right: 24px;
+      top: 24px;
+      width: 150px;
+      background: rgba(8, 20, 13, .74);
+      border: 2px solid rgba(126, 230, 166, .45);
+      border-radius: 14px;
+      padding: 8px;
+      font-size: 11px;
+      color: #d8f0ce;
+      box-shadow: 0 10px 28px rgba(0,0,0,.32);
+      z-index: 3;
+    }
+
+    .camera-panel video {
+      width: 100%;
+      height: 86px;
+      object-fit: cover;
+      border-radius: 10px;
+      transform: scaleX(-1);
+      background: #07120d;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .camera-status { line-height: 1.5; opacity: .92; }
+
+    .camera-actions {
+      display: flex;
+      gap: 5px;
+      margin-top: 6px;
+    }
+
+    .mini-btn {
+      flex: 1;
+      border: 0;
+      background: linear-gradient(#9cffba, #4fae63);
+      color: #0b2817;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 5px 4px;
+      border-radius: 8px;
+      box-shadow: 0 3px 0 #235b31;
+      cursor: pointer;
+    }
+
+    .mini-btn.secondary {
+      background: linear-gradient(#ffe08a, #d79531);
+      color: #40240c;
+      box-shadow: 0 3px 0 #7a4416;
+    }
+
+    .motion-pill {
+      display: inline-block;
+      min-width: 42px;
+      text-align: center;
+      padding: 2px 5px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.1);
+      color: #ffd36b;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 760px) {
+      .camera-panel { right: 20px; top: 20px; width: 126px; }
+      .camera-panel video { height: 72px; }
+    }
+
+
+    .menu-hero {
+      position: relative;
+      min-height: 250px;
+      border-radius: 18px;
+      overflow: hidden;
+      margin: 8px 0 16px;
+      border: 2px solid rgba(255, 211, 107, .36);
+      background:
+        radial-gradient(circle at 50% 22%, rgba(255, 224, 138, .26), transparent 24%),
+        radial-gradient(circle at 50% 95%, rgba(126, 230, 166, .22), transparent 38%),
+        linear-gradient(#173e26, #08150e 72%);
+      box-shadow: inset 0 0 30px rgba(255,255,255,.08);
+    }
+
+    .hero-title {
+      position: absolute;
+      top: 22px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      z-index: 2;
+    }
+
+    .hero-title h1 {
+      font-size: 42px;
+      margin-bottom: 2px;
+    }
+
+    .hero-title .sub {
+      color: #d8f0ce;
+      font-size: 13px;
+      letter-spacing: 1px;
+    }
+
+    .hero-scene {
+      position: absolute;
+      inset: 0;
+    }
+
+    .pixel-moon {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #ffe9a8;
+      right: 58px;
+      top: 40px;
+      box-shadow: 0 0 30px rgba(255, 226, 142, .65);
+    }
+
+    .hero-path {
+      position: absolute;
+      left: 50%;
+      bottom: -30px;
+      width: 170px;
+      height: 230px;
+      transform: translateX(-50%);
+      clip-path: polygon(35% 0, 65% 0, 100% 100%, 0 100%);
+      background: linear-gradient(#765631, #a77b45);
+      border-left: 6px solid rgba(214, 186, 118, .42);
+      border-right: 6px solid rgba(214, 186, 118, .42);
+    }
+
+    .hero-gate {
+      position: absolute;
+      left: 50%;
+      bottom: 122px;
+      width: 94px;
+      height: 68px;
+      transform: translateX(-50%);
+      border: 8px solid #6a4c2d;
+      border-bottom: 0;
+      border-radius: 44px 44px 0 0;
+      box-shadow: 0 0 26px rgba(255, 211, 107, .36);
+    }
+
+    .hero-gate::after {
+      content: "";
+      position: absolute;
+      inset: 12px 18px 0;
+      border-radius: 40px 40px 0 0;
+      background: radial-gradient(circle at center, rgba(255, 211, 107, .7), rgba(126, 230, 166, .18), transparent 70%);
+    }
+
+    .hero-tree {
+      position: absolute;
+      bottom: 0;
+      width: 56px;
+      height: 116px;
+    }
+
+    .hero-tree.left { left: 22px; }
+    .hero-tree.right { right: 26px; transform: scaleX(-1); }
+    .hero-tree::before {
+      content: "";
+      position: absolute;
+      left: 22px;
+      bottom: 0;
+      width: 14px;
+      height: 58px;
+      background: #5a351b;
+    }
+    .hero-tree::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 42px;
+      width: 62px;
+      height: 54px;
+      background:
+        linear-gradient(transparent 0 8px, #347846 8px 18px, transparent 18px),
+        linear-gradient(90deg, transparent 0 8px, #276239 8px 54px, transparent 54px);
+      box-shadow: 0 -22px 0 -4px #3d9152, 0 18px 0 2px #276239;
+    }
+
+    .hero-character {
+      position: absolute;
+      left: 50%;
+      bottom: 58px;
+      width: 54px;
+      height: 82px;
+      transform: translateX(-50%);
+      filter: drop-shadow(0 0 12px rgba(255, 211, 107, .36));
+    }
+
+    .hero-firefly {
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      background: #ffd36b;
+      box-shadow: 0 0 12px #ffd36b;
+      animation: floatFire 3.2s ease-in-out infinite;
+    }
+
+    .hero-firefly.f1 { left: 90px; top: 110px; animation-delay: .2s; }
+    .hero-firefly.f2 { right: 92px; top: 132px; animation-delay: 1s; }
+    .hero-firefly.f3 { left: 145px; top: 178px; animation-delay: 1.6s; }
+    .hero-firefly.f4 { right: 140px; top: 88px; animation-delay: 2.1s; }
+
+    @keyframes floatFire {
+      0%, 100% { transform: translateY(0); opacity: .6; }
+      50% { transform: translateY(-14px); opacity: 1; }
+    }
+
+    .menu-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .menu-buttons .primary-wide {
+      grid-column: 1 / -1;
+      font-size: 20px;
+      padding: 13px 24px;
+    }
+
+    .menu-btn {
+      cursor: pointer;
+      border: 0;
+      background: linear-gradient(#9cffba, #4fae63);
+      color: #0b2817;
+      font-size: 15px;
+      font-weight: 900;
+      padding: 10px 14px;
+      border-radius: 999px;
+      box-shadow: 0 5px 0 #235b31, 0 12px 20px rgba(0,0,0,.18);
+    }
+
+    .menu-btn.gold {
+      background: linear-gradient(#ffe08a, #d79531);
+      color: #40240c;
+      box-shadow: 0 5px 0 #7a4416, 0 12px 20px rgba(0,0,0,.18);
+    }
+
+    .menu-btn.blue {
+      background: linear-gradient(#b8e7ff, #4a91d6);
+      color: #08233e;
+      box-shadow: 0 5px 0 #24547e, 0 12px 20px rgba(0,0,0,.18);
+    }
+
+    .screen-panel {
+      display: none;
+    }
+
+    .screen-panel.active {
+      display: block;
+    }
+
+    .screen-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .screen-title h2 {
+      margin: 0;
+    }
+
+    .back-btn {
+      cursor: pointer;
+      border: 0;
+      background: rgba(255,255,255,.12);
+      color: #f4e6bf;
+      font-size: 13px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.15);
+    }
+
+    .tutorial-grid,
+    .codex-grid,
+    .achieve-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      text-align: left;
+      margin: 10px 0 14px;
+    }
+
+    .info-card,
+    .shop-card {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 11px;
+      min-height: 86px;
+    }
+
+    .info-card b {
+      color: #ffd36b;
+    }
+
+    .shop-tabs {
+      display: flex;
+      gap: 8px;
+      margin: 8px 0 12px;
+    }
+
+    .shop-tab {
+      flex: 1;
+      padding: 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.1);
+      color: #d8f0ce;
+      border: 1px solid rgba(255,255,255,.14);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .shop-tab.active {
+      background: linear-gradient(#ffe08a, #d79531);
+      color: #40240c;
+      border: 0;
+    }
+
+    .shop-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      max-height: 375px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .shop-card {
+      position: relative;
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+
+    .shop-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0,0,0,.25);
+    }
+
+    .shop-card.selected {
+      outline: 2px solid #ffd36b;
+      box-shadow: 0 0 18px rgba(255, 211, 107, .25);
+    }
+
+    .shop-preview {
+      height: 72px;
+      border-radius: 12px;
+      background: rgba(0,0,0,.18);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .shop-card h3 {
+      margin: 0 0 4px;
+      font-size: 14px;
+      color: #ffd36b;
+    }
+
+    .shop-card p {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #d8f0ce;
+    }
+
+    .price-tag {
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      background: rgba(255, 211, 107, .18);
+      color: #ffe08a;
+      border: 1px solid rgba(255, 211, 107, .34);
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .unlock-tag {
+      position: absolute;
+      left: 8px;
+      top: 8px;
+      background: rgba(126, 230, 166, .18);
+      color: #9cffba;
+      border: 1px solid rgba(126, 230, 166, .32);
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .tiny-character {
+      position: relative;
+      width: 46px;
+      height: 64px;
+      image-rendering: pixelated;
+    }
+
+    .particle-demo {
+      position: relative;
+      width: 110px;
+      height: 52px;
+    }
+
+    .particle-dot {
+      position: absolute;
+      border-radius: 50%;
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    .current-choice {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #d8f0ce;
+    }
+
+    .setting-row {
+      background: rgba(255,255,255,.08);
+      border-radius: 12px;
+      padding: 10px;
+      margin: 8px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .setting-row select,
+    .setting-row input {
+      background: rgba(0,0,0,.25);
+      color: #f4e6bf;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 8px;
+      padding: 6px;
+    }
+
+
+    /* v2.1 UI refinements */
+    .menu-buttons .menu-btn:not(.gold) {
+      background: linear-gradient(#9cffba, #4fae63);
+      color: #0b2817;
+      box-shadow: 0 5px 0 #235b31, 0 12px 20px rgba(0,0,0,.18);
+    }
+
+    .menu-buttons .menu-btn.blue {
+      background: linear-gradient(#b8e7ff, #4a91d6);
+      color: #08233e;
+      box-shadow: 0 5px 0 #24547e, 0 12px 20px rgba(0,0,0,.18);
+    }
+
+    .menu-buttons .menu-btn.purple {
+      background: linear-gradient(#d9c4ff, #8a63d2);
+      color: #22103f;
+      box-shadow: 0 5px 0 #563a8d, 0 12px 20px rgba(0,0,0,.18);
+    }
+
+    .game-wrap {
+      gap: 14px;
+      width: min(100vw, 700px);
+    }
+
+    .side-camera {
+      position: relative;
+      align-self: flex-start;
+      margin-top: 18px;
+      width: 160px;
+      flex: 0 0 160px;
+      right: auto !important;
+      top: auto !important;
+      z-index: 5;
+    }
+
+    .game-shell {
+      position: relative;
+      width: 480px;
+      max-width: calc(100vw - 210px);
+      height: 680px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .game-shell canvas#game {
+      width: 480px;
+      height: 680px;
+    }
+
+    .game-control-bar {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      top: 92px;
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .game-control-bar.active {
+      display: flex;
+    }
+
+    .game-control-bar button {
+      pointer-events: auto;
+      border: 0;
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 900;
+      color: #10291d;
+      background: linear-gradient(#ffe08a, #d79531);
+      box-shadow: 0 4px 0 #7a4416, 0 8px 16px rgba(0,0,0,.22);
+      cursor: pointer;
+    }
+
+    .game-control-bar button.secondary-control {
+      color: #08233e;
+      background: linear-gradient(#b8e7ff, #4a91d6);
+      box-shadow: 0 4px 0 #24547e, 0 8px 16px rgba(0,0,0,.22);
+    }
+
+    .pause-overlay {
+      position: absolute;
+      inset: 12px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(3, 11, 7, 0.52);
+      backdrop-filter: blur(2px);
+      border-radius: 18px;
+      z-index: 6;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .pause-overlay.active {
+      display: flex;
+    }
+
+    .pause-card {
+      width: min(320px, 90%);
+      background: rgba(18, 38, 28, .94);
+      border: 3px solid #6cbf77;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.38);
+    }
+
+    .pause-card h2 {
+      margin-top: 0;
+      color: #ffd36b;
+    }
+
+    .pause-actions {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .pause-actions button {
+      width: 100%;
+    }
+
+    .shop-grid {
+      max-height: 340px;
+    }
+
+    .shop-grid.hidden {
+      display: none !important;
+    }
+
+    .particle-trail-preview {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      top: 37px;
+      height: 18px;
+      border-radius: 999px;
+      opacity: .65;
+      filter: blur(.2px);
+    }
+
+    @media (max-width: 760px) {
+      .game-wrap {
+        width: 100vw;
+        gap: 8px;
+        padding: 8px;
+      }
+
+      .game-shell {
+        max-width: calc(100vw - 132px);
+      }
+
+      .side-camera {
+        width: 120px;
+        flex-basis: 120px;
+        margin-top: 10px;
+      }
+    }
+
+
+    /* v2.2 layout fix: center by game canvas only, camera floats outside */
+    .game-wrap {
+      width: 520px !important;
+      height: min(100vh, 720px);
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      position: relative !important;
+      gap: 0 !important;
+      padding: 12px !important;
+      overflow: visible !important;
+    }
+
+    .game-shell {
+      position: relative !important;
+      width: 480px !important;
+      height: 680px !important;
+      max-width: 480px !important;
+      flex: 0 0 480px !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .side-camera {
+      position: absolute !important;
+      left: calc(50% + 265px) !important;
+      top: 30px !important;
+      width: 160px !important;
+      flex: none !important;
+      margin: 0 !important;
+      z-index: 7 !important;
+    }
+
+    .menu-buttons .menu-btn.green-pair {
+      background: linear-gradient(#9cffba, #4fae63) !important;
+      color: #0b2817 !important;
+      box-shadow: 0 5px 0 #235b31, 0 12px 20px rgba(0,0,0,.18) !important;
+    }
+
+    .menu-buttons .menu-btn.brown-pair {
+      background: linear-gradient(#b9824a, #6a4c2d) !important;
+      color: #fff2ad !important;
+      box-shadow: 0 5px 0 #3e2815, 0 12px 20px rgba(0,0,0,.18) !important;
+    }
+
+    @media (max-width: 760px) {
+      .game-wrap {
+        width: 100vw !important;
+        justify-content: center !important;
+        overflow: visible !important;
+      }
+
+      .side-camera {
+        left: auto !important;
+        right: 10px !important;
+        top: 10px !important;
+        width: 118px !important;
+        transform: scale(.92);
+        transform-origin: top right;
+      }
+    }
+
+
+    /* v2.4 visual polish: brighter green menu, pixel typography, badge codex */
+    body, button, input, select {
+      font-family: "Courier New", "Lucida Console", "Consolas", "Microsoft YaHei", monospace !important;
+      letter-spacing: .3px;
+    }
+
+    h1, .hero-title h1 {
+      font-family: "Courier New", "Lucida Console", monospace !important;
+      font-weight: 900;
+      color: #ffe08a !important;
+      letter-spacing: 4px;
+      text-shadow:
+        3px 0 0 #6a4c2d,
+        -3px 0 0 #6a4c2d,
+        0 3px 0 #6a4c2d,
+        0 -3px 0 #6a4c2d,
+        5px 5px 0 #2d1b0e,
+        0 0 16px rgba(255, 211, 107, .52);
+      image-rendering: pixelated;
+    }
+
+    h2 {
+      font-family: "Courier New", "Lucida Console", monospace !important;
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 0 #2d1b0e;
+    }
+
+    .menu-buttons .menu-btn.bright-green,
+    .menu-buttons .menu-btn.green-pair,
+    .menu-buttons .menu-btn.brown-pair,
+    .menu-buttons .menu-btn.blue,
+    .menu-buttons .menu-btn:not(.gold) {
+      background: linear-gradient(#b8ffc9, #70d983) !important;
+      color: #0b2817 !important;
+      border: 2px solid rgba(244, 230, 191, .25);
+      box-shadow: 0 5px 0 #3f8d45, 0 12px 20px rgba(0,0,0,.18) !important;
+    }
+
+    .menu-buttons .menu-btn.bright-green:hover,
+    .menu-buttons .menu-btn.green-pair:hover,
+    .menu-buttons .menu-btn.brown-pair:hover,
+    .menu-buttons .menu-btn.blue:hover,
+    .menu-buttons .menu-btn:not(.gold):hover {
+      filter: brightness(1.08);
+    }
+
+    .codex-grid.upgraded {
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .codex-stat-card {
+      position: relative;
+      min-height: 108px;
+      padding: 12px;
+      border-radius: 16px;
+      background:
+        linear-gradient(135deg, rgba(255, 211, 107, .12), rgba(126, 230, 166, .08)),
+        rgba(255,255,255,.075);
+      border: 2px solid rgba(255, 211, 107, .22);
+      overflow: hidden;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.035);
+    }
+
+    .codex-stat-card::after {
+      content: "";
+      position: absolute;
+      right: -16px;
+      bottom: -16px;
+      width: 64px;
+      height: 64px;
+      background: radial-gradient(circle, rgba(255, 211, 107, .18), transparent 65%);
+    }
+
+    .codex-icon {
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      border-radius: 10px;
+      background: rgba(255, 211, 107, .18);
+      box-shadow: inset 0 0 0 2px rgba(255, 211, 107, .24);
+      font-size: 20px;
+    }
+
+    .codex-stat-card b {
+      display: block;
+      color: #ffd36b;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .codex-value {
+      font-size: 20px;
+      color: #f4e6bf;
+      font-weight: 900;
+      text-shadow: 2px 2px 0 #2d1b0e;
+    }
+
+    .codex-bar {
+      height: 8px;
+      margin-top: 9px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.25);
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.1);
+    }
+
+    .codex-bar span {
+      display: block;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #70d983, #ffd36b);
+    }
+
+    .badge-wall {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .badge-card {
+      display: grid;
+      grid-template-columns: 58px 1fr;
+      gap: 10px;
+      align-items: center;
+      text-align: left;
+      padding: 10px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.075);
+      border: 2px solid rgba(126, 230, 166, .18);
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.025);
+    }
+
+    .badge-icon {
+      width: 54px;
+      height: 54px;
+      position: relative;
+      border-radius: 16px;
+      background: linear-gradient(#ffe08a, #b9824a);
+      box-shadow: 0 5px 0 #6a4c2d, 0 0 16px rgba(255, 211, 107, .25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 25px;
+      color: #40240c;
+      text-shadow: 1px 1px 0 #fff2ad;
+      border: 3px solid #fff2ad;
+    }
+
+    .badge-icon.green {
+      background: linear-gradient(#b8ffc9, #4fae63);
+      color: #0b2817;
+      box-shadow: 0 5px 0 #235b31, 0 0 16px rgba(126,230,166,.25);
+    }
+
+    .badge-icon.blue {
+      background: linear-gradient(#b8e7ff, #4a91d6);
+      color: #08233e;
+      box-shadow: 0 5px 0 #24547e, 0 0 16px rgba(184,231,255,.25);
+    }
+
+    .badge-icon.pink {
+      background: linear-gradient(#ffd1e3, #d96f99);
+      color: #431529;
+      box-shadow: 0 5px 0 #8b3d5d, 0 0 16px rgba(255,159,199,.25);
+    }
+
+    .badge-card h3 {
+      margin: 0 0 4px;
+      font-size: 14px;
+      color: #ffd36b;
+    }
+
+    .badge-card p {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #d8f0ce;
+    }
+
+
+    /* v2.5 refinements */
+    .pixel-title-img {
+      width: 330px;
+      max-width: 92%;
+      height: auto;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 6px 0 #2d1b0e) drop-shadow(0 0 12px rgba(255, 211, 107, .32));
+      margin-top: -6px;
+    }
+
+    .menu-buttons .menu-btn.bright-green,
+    .menu-buttons .menu-btn.green-pair,
+    .menu-buttons .menu-btn.brown-pair,
+    .menu-buttons .menu-btn.blue,
+    .menu-buttons .menu-btn:not(.gold) {
+      background: linear-gradient(#5fbf72, #347846) !important;
+      color: #f4e6bf !important;
+      border: 2px solid rgba(244, 230, 191, .20);
+      box-shadow: 0 5px 0 #235b31, 0 12px 20px rgba(0,0,0,.18) !important;
+      text-shadow: 1px 1px 0 #10291d;
+    }
+
+    .menu-buttons .menu-btn.bright-green:hover,
+    .menu-buttons .menu-btn.green-pair:hover,
+    .menu-buttons .menu-btn.brown-pair:hover,
+    .menu-buttons .menu-btn.blue:hover,
+    .menu-buttons .menu-btn:not(.gold):hover {
+      filter: brightness(1.04);
+    }
+
+    .codex-tabs {
+      display: flex;
+      gap: 8px;
+      margin: 8px 0 12px;
+    }
+
+    .codex-tab {
+      flex: 1;
+      padding: 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.1);
+      color: #d8f0ce;
+      border: 1px solid rgba(255,255,255,.14);
+      cursor: pointer;
+      font-weight: 900;
+      box-shadow: none;
+    }
+
+    .codex-tab.active {
+      background: linear-gradient(#5fbf72, #347846);
+      color: #f4e6bf;
+      border: 2px solid rgba(244, 230, 191, .20);
+      text-shadow: 1px 1px 0 #10291d;
+    }
+
+    .codex-page.hidden {
+      display: none !important;
+    }
+
+    .codex-grid.upgraded,
+    .badge-wall {
+      max-height: 390px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="game-wrap">
+    <div class="game-shell">
+    <canvas id="game" width="480" height="680"></canvas>
+    <div id="gameControlBar" class="game-control-bar">
+      <button id="pauseBtn" type="button">暂停</button>
+      <button id="restartGameBtn" class="secondary-control" type="button">重新开始</button>
+    </div>
+    <div id="pauseOverlay" class="pause-overlay">
+      <div class="pause-card">
+        <h2>漫行暂停</h2>
+        <p class="hint">可以继续放松肩颈，也可以返回主菜单重新选择装扮。</p>
+        <div class="pause-actions">
+          <button id="resumeBtn" type="button">继续漫行</button>
+          <button id="pauseRestartBtn" class="menu-btn bright-green" type="button">重新开始</button>
+          <button id="pauseMenuBtn" class="menu-btn" type="button">返回主菜单</button>
+        </div>
+      </div>
+    </div>
+    <div id="startOverlay" class="overlay">
+      <div class="card" id="menuCard">
+        <div id="mainMenuScreen" class="screen-panel active">
+          <div class="menu-hero">
+            <div class="hero-scene">
+              <div class="pixel-moon"></div>
+              <div class="hero-tree left"></div>
+              <div class="hero-tree right"></div>
+              <div class="hero-gate"></div>
+              <div class="hero-path"></div>
+              <div class="hero-firefly f1"></div>
+              <div class="hero-firefly f2"></div>
+              <div class="hero-firefly f3"></div>
+              <div class="hero-firefly f4"></div>
+              <canvas id="heroCharacterCanvas" class="hero-character" width="54" height="82"></canvas>
+            </div>
+            <div class="hero-title">
+              <img class="pixel-title-img" src="data:image/png;base64,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" alt="颈野漫行">
+              <div class="sub">Neckscape · 森林秘境肩颈放松跑酷</div>
+            </div>
+          </div>
+
+          <p class="hint">转动脖颈，穿越林野，在漫行中放松身体。</p>
+          <div class="menu-buttons">
+            <button id="startBtn" class="gold primary-wide">开始漫行</button>
+            <button id="tutorialBtn" class="menu-btn bright-green">动作教程</button>
+            <button id="shopBtn" class="menu-btn bright-green">积分商城</button>
+            <button id="codexBtn" class="menu-btn bright-green">成长图鉴</button>
+            <button id="settingsBtn" class="menu-btn bright-green">设置</button>
+          </div>
+          <p class="hint current-choice" id="menuChoiceText">当前装扮：漫游者 · 默认萤火</p>
+        </div>
+
+        <div id="tutorialScreen" class="screen-panel">
+          <div class="screen-title">
+            <h2>动作教程</h2>
+            <button class="back-btn" data-back>返回</button>
+          </div>
+          <div class="tutorial-grid">
+            <div class="info-card"><b>左肩下沉</b><br>切换到左侧道路，适合规避前方障碍。</div>
+            <div class="info-card"><b>右肩下沉</b><br>切换到右侧道路，保持动作轻柔。</div>
+            <div class="info-card"><b>仰头</b><br>角色跳跃，越过树桩、石块等地面障碍。</div>
+            <div class="info-card"><b>低头</b><br>触发自动下蹲，穿过横枝与垂落藤蔓。</div>
+            <div class="info-card"><b>左转头</b><br>向左扫视，收集左侧萤火积分。</div>
+            <div class="info-card"><b>右转头</b><br>向右扫视，收集右侧萤火积分。</div>
+          </div>
+          <button id="tutorialStartBtn" class="gold primary-wide">我已了解，开始漫行</button>
+        </div>
+
+        <div id="shopScreen" class="screen-panel">
+          <div class="screen-title">
+            <h2>积分商城</h2>
+            <button class="back-btn" data-back>返回</button>
+          </div>
+          <p class="hint">内部展示版：全部装扮已解锁，可自由切换。越稀有的装扮特效越华丽。</p>
+          <div class="shop-tabs">
+            <button class="shop-tab active" data-shop-tab="skins">人物皮肤</button>
+            <button class="shop-tab" data-shop-tab="particles">粒子特效</button>
+          </div>
+          <div id="skinShopGrid" class="shop-grid"></div>
+          <div id="particleShopGrid" class="shop-grid hidden"></div>
+          <p class="hint current-choice" id="shopChoiceText">当前装扮：漫游者 · 默认萤火</p>
+        </div>
+
+        <div id="codexScreen" class="screen-panel">
+          <div class="screen-title">
+            <h2>成长图鉴</h2>
+            <button class="back-btn" data-back>返回</button>
+          </div>
+
+          <div class="codex-tabs">
+            <button class="codex-tab active" data-codex-tab="records">训练记录</button>
+            <button class="codex-tab" data-codex-tab="achievements">成就徽章</button>
+          </div>
+
+          <div id="codexRecordsPage" class="codex-page">
+            <div class="codex-grid upgraded">
+              <div class="codex-stat-card">
+                <div class="codex-icon">🌲</div>
+                <b>累计漫行</b>
+                <div class="codex-value" id="codexDistance">12580m</div>
+                <div class="codex-bar"><span style="width:88%"></span></div>
+              </div>
+              <div class="codex-stat-card">
+                <div class="codex-icon">✨</div>
+                <b>累计萤火</b>
+                <div class="codex-value" id="codexFireflies">860个</div>
+                <div class="codex-bar"><span style="width:76%"></span></div>
+              </div>
+              <div class="codex-stat-card">
+                <div class="codex-icon">↑</div>
+                <b>仰头训练</b>
+                <div class="codex-value" id="codexJump">326次</div>
+                <div class="codex-bar"><span style="width:72%"></span></div>
+              </div>
+              <div class="codex-stat-card">
+                <div class="codex-icon">↓</div>
+                <b>低头训练</b>
+                <div class="codex-value" id="codexCrouch">298次</div>
+                <div class="codex-bar"><span style="width:68%"></span></div>
+              </div>
+              <div class="codex-stat-card">
+                <div class="codex-icon">↔</div>
+                <b>肩部激活</b>
+                <div class="codex-value" id="codexShoulder">512次</div>
+                <div class="codex-bar"><span style="width:82%"></span></div>
+              </div>
+              <div class="codex-stat-card">
+                <div class="codex-icon">◎</div>
+                <b>颈部扫视</b>
+                <div class="codex-value" id="codexScan">684次</div>
+                <div class="codex-bar"><span style="width:91%"></span></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="codexAchievementsPage" class="codex-page hidden">
+            <div class="badge-wall">
+              <div class="badge-card">
+                <div class="badge-icon green">🌱</div>
+                <div><h3>初次漫行</h3><p>完成第一场森林旅程，开启肩颈放松记录。</p></div>
+              </div>
+              <div class="badge-card">
+                <div class="badge-icon">✦</div>
+                <div><h3>萤火收藏家</h3><p>累计收集 500 个萤火，点亮林间小径。</p></div>
+              </div>
+              <div class="badge-card">
+                <div class="badge-icon blue">↑</div>
+                <div><h3>灵活颈椎</h3><p>完成 300 次仰头/低头训练，活动度优秀。</p></div>
+              </div>
+              <div class="badge-card">
+                <div class="badge-icon pink">↔</div>
+                <div><h3>肩颈大师</h3><p>左右肩与转头动作均衡，训练完成度高。</p></div>
+              </div>
+              <div class="badge-card">
+                <div class="badge-icon green">🍃</div>
+                <div><h3>森林旅人</h3><p>累计漫行超过 10000 米，步入秘境深处。</p></div>
+              </div>
+              <div class="badge-card">
+                <div class="badge-icon">👑</div>
+                <div><h3>森境大师</h3><p>解锁全部皮肤与粒子特效，展示版完全点亮。</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="settingsScreen" class="screen-panel">
+          <div class="screen-title">
+            <h2>设置</h2>
+            <button class="back-btn" data-back>返回</button>
+          </div>
+          <div class="setting-row">
+            <div><b>BGM 音量</b><br><span class="hint">展示版视觉优先，音量轻柔。</span></div>
+            <input id="bgmVolumeRange" type="range" min="0" max="100" value="65">
+          </div>
+          <div class="setting-row">
+            <div><b>音效音量</b><br><span class="hint">跳跃、收集、扫视反馈。</span></div>
+            <input id="sfxVolumeRange" type="range" min="0" max="100" value="85">
+          </div>
+          <div class="setting-row">
+            <div><b>动捕提示</b><br><span class="hint">右上角摄像头与动作状态会一直保留。</span></div>
+            <span class="motion-pill">已开启</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="endOverlay" class="overlay hidden">
+      <div class="card">
+        <h2>森林舒展评分报告</h2>
+        <div class="score-big" id="gradeText">A / 90分</div>
+        <p id="commentText" class="hint">本局肩颈活动完成良好。</p>
+        <div class="report-grid" id="reportGrid"></div>
+        <button id="restartBtn">返回主菜单</button>
+      </div>
+    </div>
+    </div>
+
+    <div class="camera-panel side-camera">
+      <video id="webcam" autoplay playsinline muted></video>
+      <div class="camera-status">
+        <div>动捕：<span id="motionStatus">未开启</span></div>
+        <div>动作：<span id="motionAction" class="motion-pill">键盘</span></div>
+        <div>校准：<span id="calibrationStatus">未校准</span></div>
+      </div>
+      <div class="camera-actions">
+        <button id="cameraBtn" class="mini-btn" type="button">开摄像头</button>
+        <button id="calibrateBtn" class="mini-btn secondary" type="button">校准</button>
+      </div>
+    </div>
+
+
+
+  </div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+
+  const W = canvas.width;
+  const H = canvas.height;
+  const lanes = [150, 240, 330];
+
+  const state = {
+    running: false,
+    over: false,
+    paused: false,
+    frame: 0,
+    speed: 0.4125,
+    distance: 0,
+    score: 0,
+    lives: 3,
+    lane: 1,
+    targetLane: 1,
+    playerX: lanes[1],
+    playerY: 560,
+    jumpT: 0,
+    crouchT: 0,
+    scanT: 0,
+    scanDir: 0,
+    invincible: 0,
+    obstacles: [],
+    fireflies: [],
+    particles: [],
+    lastObstacleKind: 'air',
+    stats: {
+      jump: 0,
+      crouch: 0,
+      leftShoulder: 0,
+      rightShoulder: 0,
+      leftTurn: 0,
+      rightTurn: 0,
+      fireCollected: 0
+    }
+  };
+
+  const keysDown = new Set();
+  const pressed = new Set();
+
+  let audioCtx = null;
+  let bgmTimer = null;
+  let ambientTimer = null;
+  let bgmStep = 0;
+  let audioEnabled = false;
+
+  const motion = {
+    enabled: false,
+    calibrated: false,
+    ready: false,
+    landmarker: null,
+    faceLandmarker: null,
+    video: null,
+    stream: null,
+    baseline: null,
+    lastVideoTime: -1,
+    cooldown: {
+      left: 0,
+      right: 0,
+      jump: 0,
+      crouch: 0,
+      scanLeft: 0,
+      scanRight: 0
+    },
+    latch: {
+      shoulder: null,
+      headTurn: null,
+      jump: false,
+      crouch: false
+    },
+    actionText: '键盘'
+  };
+
+  const motionPressed = new Set();
+
+  const cosmetics = {
+    selectedSkin: 'wanderer',
+    selectedParticle: 'firefly',
+    skins: [
+      { id:'wanderer', name:'漫游者', price:0, level:1, desc:'默认森林旅者，清爽稳定。', body:'#2f75c9', trim:'#6fd0ff', hair:'#3f2c1f', glow:null },
+      { id:'ember', name:'萤火旅人', price:500, level:2, desc:'暖黄色发光边缘，适合森林夜路。', body:'#db8f2f', trim:'#ffd36b', hair:'#593319', glow:'#ffd36b' },
+      { id:'moon', name:'月影巡林者', price:1200, level:3, desc:'蓝紫月光装束，低调而清冷。', body:'#4656c9', trim:'#b8e7ff', hair:'#22284f', glow:'#9fd8ff' },
+      { id:'autumn', name:'秋野拾光者', price:2500, level:4, desc:'橙金秋叶风格，奔跑时更温暖。', body:'#b85f2e', trim:'#ffb45c', hair:'#4b2a17', glow:'#ff9f43' },
+      { id:'spirit', name:'森灵守望者', price:5000, level:5, desc:'绿色荧光披风，带自然守护感。', body:'#278c5a', trim:'#9cffba', hair:'#183b25', glow:'#7ee6a6' },
+      { id:'envoy', name:'林境使者', price:9999, level:6, desc:'最高级展示皮肤，金色光环与华丽发光。', body:'#d79531', trim:'#fff2ad', hair:'#6b3e19', glow:'#ffe08a' }
+    ],
+    particles: [
+      { id:'firefly', name:'默认萤火', price:0, level:1, desc:'柔和黄色光点。', color:'#ffd36b', type:'dot' },
+      { id:'leaf', name:'金叶尾迹', price:500, level:2, desc:'小片金叶随步伐飘散。', color:'#d79531', type:'leaf' },
+      { id:'star', name:'星光尾迹', price:1200, level:3, desc:'白金色星点闪烁。', color:'#fff2ad', type:'star' },
+      { id:'petal', name:'花瓣粒子', price:2500, level:4, desc:'柔和花瓣飘落，治愈感更强。', color:'#ff9fc7', type:'petal' },
+      { id:'spiritGlow', name:'森灵荧光', price:5000, level:5, desc:'绿色自然微光环绕。', color:'#7ee6a6', type:'spirit' },
+      { id:'moonTrail', name:'月辉光尾', price:9999, level:6, desc:'最高级蓝白月光拖尾。', color:'#b8e7ff', type:'moon' }
+    ]
+  };
+
+  function getSelectedSkin(){
+    return cosmetics.skins.find(s => s.id === cosmetics.selectedSkin) || cosmetics.skins[0];
+  }
+
+  function getSelectedParticle(){
+    return cosmetics.particles.find(p => p.id === cosmetics.selectedParticle) || cosmetics.particles[0];
+  }
+
+  function showMenuScreen(id){
+    document.querySelectorAll('#menuCard .screen-panel').forEach(panel => panel.classList.remove('active'));
+    const target = document.getElementById(id);
+    if(target) target.classList.add('active');
+    updateChoiceText();
+  }
+
+  function updateChoiceText(){
+    const skin = getSelectedSkin();
+    const particle = getSelectedParticle();
+    const text = `当前装扮：${skin.name} · ${particle.name}`;
+    const menu = document.getElementById('menuChoiceText');
+    const shop = document.getElementById('shopChoiceText');
+    if(menu) menu.textContent = text;
+    if(shop) shop.textContent = text;
+    drawHeroCharacter();
+  }
+
+  function drawMiniCharacterToCanvas(canvas, skinId){
+    if(!canvas) return;
+    const c = canvas.getContext('2d');
+    c.imageSmoothingEnabled = false;
+    const skin = cosmetics.skins.find(s => s.id === skinId) || getSelectedSkin();
+    c.clearRect(0,0,canvas.width,canvas.height);
+    const x = canvas.width / 2;
+    const y = canvas.height - 8;
+
+    if(skin.glow) {
+      c.globalAlpha = 0.35;
+      c.fillStyle = skin.glow;
+      c.beginPath();
+      c.arc(x, y-40, 28 + skin.level * 2, 0, Math.PI*2);
+      c.fill();
+      c.globalAlpha = 1;
+    }
+
+    if(skin.id === 'envoy') {
+      c.strokeStyle = '#ffe08a';
+      c.lineWidth = 3;
+      c.beginPath();
+      c.arc(x, y-67, 14, 0, Math.PI*2);
+      c.stroke();
+    }
+
+    c.fillStyle = 'rgba(0,0,0,.28)';
+    c.fillRect(x-20, y-2, 40, 7);
+
+    c.fillStyle = '#f2c08a';
+    c.fillRect(x-10, y-58, 20, 18);
+    c.fillStyle = skin.hair;
+    c.fillRect(x-12, y-62, 24, 7);
+    c.fillStyle = '#10291d';
+    c.fillRect(x-6, y-51, 4, 4);
+    c.fillRect(x+4, y-51, 4, 4);
+
+    c.fillStyle = skin.body;
+    c.fillRect(x-14, y-39, 28, 31);
+    c.fillStyle = skin.trim;
+    c.fillRect(x-10, y-35, 20, 7);
+    if(skin.level >= 5) {
+      c.fillStyle = skin.trim;
+      c.fillRect(x-20, y-36, 6, 28);
+      c.fillRect(x+14, y-36, 6, 28);
+    }
+
+    c.fillStyle = '#f2c08a';
+    c.fillRect(x-22, y-32, 8, 20);
+    c.fillRect(x+14, y-32, 8, 20);
+    c.fillStyle = '#243e7f';
+    c.fillRect(x-12, y-8, 9, 22);
+    c.fillRect(x+3, y-8, 9, 22);
+    c.fillStyle = '#1b263f';
+    c.fillRect(x-15, y+12, 15, 6);
+    c.fillRect(x+2, y+12, 15, 6);
+  }
+
+  function drawHeroCharacter(){
+    const hero = document.getElementById('heroCharacterCanvas');
+    if(hero) drawMiniCharacterToCanvas(hero, cosmetics.selectedSkin);
+  }
+
+  function makePreviewCanvas(className, skinId){
+    const canvas = document.createElement('canvas');
+    canvas.width = 86;
+    canvas.height = 72;
+    canvas.className = className || '';
+    setTimeout(() => drawMiniCharacterToCanvas(canvas, skinId), 0);
+    return canvas;
+  }
+
+  function makeParticlePreview(particle){
+    const box = document.createElement('div');
+    box.className = 'particle-demo';
+
+    const trail = document.createElement('div');
+    trail.className = 'particle-trail-preview';
+    trail.style.background = `linear-gradient(90deg, transparent, ${particle.color}, transparent)`;
+    trail.style.boxShadow = `0 0 14px ${particle.color}`;
+    box.appendChild(trail);
+
+    for(let i=0;i<10;i++){
+      const dot = document.createElement('span');
+      dot.className = 'particle-dot';
+      const size = particle.level >= 5 ? 7 : 5;
+      dot.style.width = `${size}px`;
+      dot.style.height = `${size}px`;
+      dot.style.color = particle.color;
+      dot.style.background = particle.type === 'leaf' ? 'transparent' : particle.color;
+      dot.style.left = `${8 + i*10}px`;
+      dot.style.top = `${12 + Math.sin(i)*14}px`;
+      dot.style.opacity = `${0.35 + i*0.07}`;
+      if(particle.type === 'leaf') {
+        dot.style.borderRadius = '80% 0 80% 0';
+        dot.style.background = particle.color;
+        dot.style.transform = 'rotate(35deg)';
+      }
+      if(particle.type === 'star') {
+        dot.textContent = '✦';
+        dot.style.background = 'transparent';
+        dot.style.fontSize = '13px';
+      }
+      if(particle.type === 'petal') {
+        dot.style.borderRadius = '80% 20% 80% 20%';
+        dot.style.transform = 'rotate(-25deg)';
+      }
+      if(particle.type === 'moon') {
+        dot.textContent = '✧';
+        dot.style.background = 'transparent';
+        dot.style.fontSize = '15px';
+      }
+      box.appendChild(dot);
+    }
+    return box;
+  }
+
+  function renderShop(){
+    const skinGrid = document.getElementById('skinShopGrid');
+    const particleGrid = document.getElementById('particleShopGrid');
+    if(!skinGrid || !particleGrid) return;
+
+    skinGrid.innerHTML = '';
+    particleGrid.innerHTML = '';
+
+    cosmetics.skins.forEach(skin => {
+      const card = document.createElement('div');
+      card.className = 'shop-card' + (skin.id === cosmetics.selectedSkin ? ' selected' : '');
+      card.dataset.skinId = skin.id;
+      card.innerHTML = `
+        <span class="unlock-tag">已解锁</span>
+        <span class="price-tag">${skin.price}萤火</span>
+        <div class="shop-preview"></div>
+        <h3>${skin.name}</h3>
+        <p>${skin.desc}</p>
+      `;
+      card.querySelector('.shop-preview').appendChild(makePreviewCanvas('tiny-character', skin.id));
+      card.addEventListener('click', () => {
+        cosmetics.selectedSkin = skin.id;
+        renderShop();
+        updateChoiceText();
+      });
+      skinGrid.appendChild(card);
+    });
+
+    cosmetics.particles.forEach(particle => {
+      const card = document.createElement('div');
+      card.className = 'shop-card' + (particle.id === cosmetics.selectedParticle ? ' selected' : '');
+      card.dataset.particleId = particle.id;
+      card.innerHTML = `
+        <span class="unlock-tag">已解锁</span>
+        <span class="price-tag">${particle.price}萤火</span>
+        <div class="shop-preview"></div>
+        <h3>${particle.name}</h3>
+        <p>${particle.desc}</p>
+      `;
+      card.querySelector('.shop-preview').appendChild(makeParticlePreview(particle));
+      card.addEventListener('click', () => {
+        cosmetics.selectedParticle = particle.id;
+        renderShop();
+        updateChoiceText();
+      });
+      particleGrid.appendChild(card);
+    });
+  }
+
+  function createTrailParticle(x, y){
+    const p = getSelectedParticle();
+    const spread = p.level * 0.18;
+    const size = 3 + Math.min(5, p.level);
+
+    // 主要拖尾：生成在角色身后，随角色移动方向向下漂移
+    state.particles.push({
+      x: x + (Math.random()-.5)*16,
+      y: y + 18 + Math.random()*16,
+      color: p.color,
+      type: p.type,
+      life: 42 + p.level * 8,
+      vx: (Math.random()-.5) * (0.6 + spread),
+      vy: 0.45 + Math.random() * 0.45,
+      size
+    });
+
+    // 高级粒子额外生成柔和残光，不影响视线
+    if(p.level >= 4 && Math.random() < 0.65) {
+      state.particles.push({
+        x: x + (Math.random()-.5)*26,
+        y: y + 24 + Math.random()*18,
+        color: p.color,
+        type: 'glowTrail',
+        life: 34 + p.level * 6,
+        vx: (Math.random()-.5) * 0.4,
+        vy: 0.35 + Math.random()*0.25,
+        size: size + 3
+      });
+    }
+  }
+
+  function drawCustomParticle(p){
+    ctx.globalAlpha = Math.max(0, p.life/52);
+    ctx.fillStyle = p.color;
+    ctx.strokeStyle = p.color;
+
+    if(p.type === 'leaf') {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((state.frame + p.life) * 0.04);
+      pixelRect(-p.size/2, -p.size/2, p.size+3, p.size, p.color);
+      ctx.restore();
+    } else if(p.type === 'star' || p.type === 'moon') {
+      ctx.font = `${Math.max(10, p.size+5)}px Arial`;
+      ctx.fillText(p.type === 'moon' ? '✧' : '✦', p.x, p.y);
+    } else if(p.type === 'petal') {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((state.frame + p.life) * -0.035);
+      pixelRect(-p.size/2, -p.size/2, p.size+3, p.size, p.color);
+      ctx.restore();
+    } else if(p.type === 'glowTrail') {
+      ctx.globalAlpha = Math.max(0, p.life/70) * 0.45;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      pixelRect(p.x, p.y, p.size, p.size, p.color);
+    }
+
+    ctx.globalAlpha = 1;
+  }
+
+
+
+
+
+  function setMotionStatus(text){
+    const el = document.getElementById('motionStatus');
+    if(el) el.textContent = text;
+  }
+
+  function setMotionAction(text){
+    motion.actionText = text;
+    const el = document.getElementById('motionAction');
+    if(el) el.textContent = text;
+  }
+
+  function setCalibrationStatus(text){
+    const el = document.getElementById('calibrationStatus');
+    if(el) el.textContent = text;
+  }
+
+  async function initMotionCapture(){
+    try {
+      setMotionStatus('加载中');
+      motion.video = document.getElementById('webcam');
+
+      const vision = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest');
+      const filesetResolver = await vision.FilesetResolver.forVisionTasks(
+        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm'
+      );
+
+      motion.landmarker = await vision.PoseLandmarker.createFromOptions(filesetResolver, {
+        baseOptions: {
+          modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task',
+          delegate: 'GPU'
+        },
+        runningMode: 'VIDEO',
+        numPoses: 1
+      });
+
+      motion.faceLandmarker = await vision.FaceLandmarker.createFromOptions(filesetResolver, {
+        baseOptions: {
+          modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task',
+          delegate: 'GPU'
+        },
+        runningMode: 'VIDEO',
+        numFaces: 1
+      });
+
+      motion.stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
+        audio: false
+      });
+
+      motion.video.srcObject = motion.stream;
+      await motion.video.play();
+
+      motion.enabled = true;
+      motion.ready = true;
+      setMotionStatus('已开启');
+      setMotionAction('请校准');
+      requestAnimationFrame(predictMotionLoop);
+    } catch (err) {
+      console.error(err);
+      setMotionStatus('开启失败');
+      setMotionAction('用键盘');
+      alert('摄像头动捕开启失败。请确认浏览器允许摄像头权限，并尽量使用 HTTPS 或本地 localhost 打开。');
+    }
+  }
+
+  function calibrateMotion(){
+    if(!motion.ready || !motion.video || !motion.landmarker) {
+      setCalibrationStatus('请先开摄像头');
+      return;
+    }
+
+    const result = motion.landmarker.detectForVideo(motion.video, performance.now());
+    const pose = result.landmarks && result.landmarks[0];
+
+    if(!pose) {
+      setCalibrationStatus('未识别到人');
+      setMotionAction('坐正重试');
+      return;
+    }
+
+    const n = pose[0];
+    const ls = pose[11];
+    const rs = pose[12];
+
+    if(!n || !ls || !rs) {
+      setCalibrationStatus('关键点不足');
+      return;
+    }
+
+    let face = null;
+    try {
+      if(motion.faceLandmarker) {
+        const faceResult = motion.faceLandmarker.detectForVideo(motion.video, performance.now());
+        face = faceResult.faceLandmarks && faceResult.faceLandmarks[0];
+      }
+    } catch(e) {
+      console.warn('Face calibration skipped:', e);
+    }
+
+    const chin = face && face[152] ? face[152] : null;
+    const mouthL = pose[9];
+    const mouthR = pose[10];
+    const pseudoChinY = chin ? chin.y : (mouthL && mouthR ? ((mouthL.y + mouthR.y) / 2 + 0.055) : n.y + 0.075);
+
+    motion.baseline = {
+      noseX: n.x,
+      noseY: n.y,
+      chinY: pseudoChinY,
+      chinToNoseY: pseudoChinY - n.y,
+      chinToShoulderY: ((ls.y + rs.y) / 2) - pseudoChinY,
+      shoulderCenterX: (ls.x + rs.x) / 2,
+      shoulderCenterY: (ls.y + rs.y) / 2,
+      shoulderDiffY: ls.y - rs.y,
+      shoulderWidth: Math.abs(ls.x - rs.x) || 0.25,
+      noseToShoulderY: ((ls.y + rs.y) / 2) - n.y
+    };
+
+    motion.calibrated = true;
+    setCalibrationStatus('已校准');
+    setMotionAction('坐姿已记录');
+  }
+
+  function triggerMotionAction(action){
+    if(state.paused || !state.running) return;
+     if(state.paused || !state.running) return;
+    // 动捕直接执行动作，避免“状态栏识别到但下一帧没有进入游戏动作”的情况。
+    // 不再依赖 motionPressed 队列，防止同一动作被下一帧重复执行。
+    if(action === 'left') doMoveLeft();
+    if(action === 'right') doMoveRight();
+    if(action === 'jump') doJump();
+    if(action === 'crouch') doCrouch();
+    if(action === 'scanLeft') doScanLeft();
+    if(action === 'scanRight') doScanRight();
+  }
+
+  function predictMotionLoop(){
+    if(!motion.enabled || !motion.landmarker || !motion.video) return;
+
+    if(motion.video.currentTime !== motion.lastVideoTime) {
+      motion.lastVideoTime = motion.video.currentTime;
+      const result = motion.landmarker.detectForVideo(motion.video, performance.now());
+      const pose = result.landmarks && result.landmarks[0];
+
+      let face = null;
+      try {
+        if(motion.faceLandmarker) {
+          const faceResult = motion.faceLandmarker.detectForVideo(motion.video, performance.now());
+          face = faceResult.faceLandmarks && faceResult.faceLandmarks[0];
+        }
+      } catch(e) {
+        face = null;
+      }
+
+      if(pose && motion.calibrated) {
+        readMotionPose(pose, face);
+      } else if(pose && !motion.calibrated) {
+        setMotionAction('等待校准');
+      } else {
+        setMotionAction('未识别人');
+      }
+    }
+
+    for(const k in motion.cooldown) {
+      if(motion.cooldown[k] > 0) motion.cooldown[k]--;
+    }
+
+    requestAnimationFrame(predictMotionLoop);
+  }
+
+  function readMotionPose(pose, face){
+    const nose = pose[0];
+    const leftShoulder = pose[11];
+    const rightShoulder = pose[12];
+
+    if(!nose || !leftShoulder || !rightShoulder) {
+      setMotionAction('关键点不足');
+      return;
+    }
+
+    const b = motion.baseline;
+    const shoulderDiff = leftShoulder.y - rightShoulder.y - b.shoulderDiffY;
+    const shoulderCenterX = (leftShoulder.x + rightShoulder.x) / 2;
+    const shoulderCenterY = (leftShoulder.y + rightShoulder.y) / 2;
+
+    // 下巴点：优先使用 FaceLandmarker 152；失败时用嘴角点模拟。
+    const mouthL = pose[9];
+    const mouthR = pose[10];
+    const faceChin = face && face[152] ? face[152] : null;
+    const chinY = faceChin ? faceChin.y : (mouthL && mouthR ? ((mouthL.y + mouthR.y) / 2 + 0.055) : nose.y + 0.075);
+
+    // 核心改动：
+    // y 轴越往下数值越大。
+    // shoulderCenterY - chinY / noseY 表示“下巴/鼻子到肩部的垂直距离”。
+    // 仰头：距离变大；低头：距离变小。
+    const noseToShoulderY = shoulderCenterY - nose.y;
+    const chinToShoulderY = shoulderCenterY - chinY;
+
+    const noseToShoulderDelta = noseToShoulderY - b.noseToShoulderY;
+    const chinToShoulderDelta = chinToShoulderY - (b.chinToShoulderY || chinToShoulderY);
+
+    // 头部左右偏移，用于侧头扫视；同时用于屏蔽侧头误触发仰头。
+    const relativeHeadX = nose.x - shoulderCenterX;
+    const baseRelativeHeadX = b.noseX - b.shoulderCenterX;
+    const turnOffset = relativeHeadX - baseRelativeHeadX;
+
+    const shoulderTrigger = 0.055;
+    const shoulderRelease = 0.026;
+
+    // 适度提高左右侧头阈值，减少沉肩误触发。
+    const headTurnTrigger = Math.max(0.082, b.shoulderWidth * 0.24);
+    const headTurnRelease = Math.max(0.044, b.shoulderWidth * 0.13);
+
+    // 仰头/低头距离阈值：
+    // 仰头必须让“下巴到肩膀距离”明显变大，同时鼻子到肩膀距离也不能变小。
+    // 这样低头、左右看都不容易误触发跳跃。
+    const headUpDistanceThreshold = 0.030;
+    const headUpNoseAssistThreshold = 0.006;
+    const headDownDistanceThreshold = -0.042;
+
+    // 侧头时禁止触发仰头，防止左右看被识别成跳跃。
+    const sideTurnBlockForJump = Math.abs(turnOffset) > Math.max(0.045, b.shoulderWidth * 0.13);
+
+    const headUpRelease = 0.012;
+    const headDownRelease = -0.018;
+
+    let detected = '标准';
+
+    // 一次沉肩只移动一次：必须回正后才可再次触发
+    if(Math.abs(shoulderDiff) < shoulderRelease) {
+      motion.latch.shoulder = null;
+    }
+
+    if(shoulderDiff > shoulderTrigger && motion.latch.shoulder !== 'left' && motion.cooldown.left <= 0) {
+      triggerMotionAction('left');
+      motion.latch.shoulder = 'left';
+      motion.cooldown.left = 85;
+      detected = '左肩下沉';
+    }
+
+    if(shoulderDiff < -shoulderTrigger && motion.latch.shoulder !== 'right' && motion.cooldown.right <= 0) {
+      triggerMotionAction('right');
+      motion.latch.shoulder = 'right';
+      motion.cooldown.right = 85;
+      detected = '右肩下沉';
+    }
+
+    // 仰头：距离变大才触发。左右侧头时不允许触发跳跃。
+    const isHeadUp =
+      !sideTurnBlockForJump &&
+      chinToShoulderDelta > headUpDistanceThreshold &&
+      noseToShoulderDelta > headUpNoseAssistThreshold;
+
+    if(chinToShoulderDelta < headUpRelease && noseToShoulderDelta < headUpRelease) {
+      motion.latch.jump = false;
+    }
+
+    if(isHeadUp && !motion.latch.jump && motion.cooldown.jump <= 0) {
+      triggerMotionAction('jump');
+      motion.latch.jump = true;
+      motion.cooldown.jump = 75;
+      detected = faceChin ? '下巴-肩距变大→已跳跃' : '仰头→已跳跃';
+    }
+
+    // 低头：距离变小才触发。阈值比上一版更大，避免沉肩时误触发。
+    const isHeadDown = chinToShoulderDelta < headDownDistanceThreshold;
+
+    if(chinToShoulderDelta > headDownRelease) {
+      motion.latch.crouch = false;
+    }
+
+    if(isHeadDown && !motion.latch.crouch && motion.cooldown.crouch <= 0) {
+      triggerMotionAction('crouch');
+      motion.latch.crouch = true;
+      motion.cooldown.crouch = 170;
+      detected = '下巴-肩距变小→已下蹲';
+    }
+
+    // 左右转头方向已对调；阈值进一步提高，减少沉肩误触发。
+    if(Math.abs(turnOffset) < headTurnRelease) {
+      motion.latch.headTurn = null;
+    }
+
+    if(turnOffset < -headTurnTrigger && motion.latch.headTurn !== 'right' && motion.cooldown.scanRight <= 0) {
+      triggerMotionAction('scanRight');
+      motion.latch.headTurn = 'right';
+      motion.cooldown.scanRight = 95;
+      detected = '右转扫视';
+    }
+
+    if(turnOffset > headTurnTrigger && motion.latch.headTurn !== 'left' && motion.cooldown.scanLeft <= 0) {
+      triggerMotionAction('scanLeft');
+      motion.latch.headTurn = 'left';
+      motion.cooldown.scanLeft = 95;
+      detected = '左转扫视';
+    }
+
+    setMotionAction(detected);
+  }
+
+  function initAudio(){
+    if(audioEnabled) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    audioEnabled = true;
+    startBGM();
+    startAmbientForest();
+  }
+
+  function now(){
+    return audioCtx ? audioCtx.currentTime : 0;
+  }
+
+  function tone(freq, duration = 0.12, type = 'sine', gain = 0.08, delay = 0){
+    if(!audioCtx) return;
+    const t = now() + delay;
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(gain, t + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+    osc.connect(g);
+    g.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + duration + 0.03);
+  }
+
+  function noise(duration = 0.15, gain = 0.06, filterFreq = 900, delay = 0){
+    if(!audioCtx) return;
+    const t = now() + delay;
+    const bufferSize = Math.max(1, Math.floor(audioCtx.sampleRate * duration));
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for(let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+    const src = audioCtx.createBufferSource();
+    const filter = audioCtx.createBiquadFilter();
+    const g = audioCtx.createGain();
+
+    src.buffer = buffer;
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(filterFreq, t);
+    g.gain.setValueAtTime(gain, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+
+    src.connect(filter);
+    filter.connect(g);
+    g.connect(audioCtx.destination);
+    src.start(t);
+    src.stop(t + duration);
+  }
+
+  function playJumpSound(){
+    if(!audioCtx) return;
+
+    tone(280, 0.10, 'square', 0.045);
+    tone(520, 0.18, 'triangle', 0.085, 0.03);
+    tone(760, 0.22, 'sine', 0.06, 0.08);
+    tone(1080, 0.16, 'triangle', 0.035, 0.14);
+
+    noise(0.03, 0.018, 1800);
+  }
+
+  function playCrouchSound(){
+    if(!audioCtx) return;
+    tone(180, 0.12, 'sine', 0.055);
+    noise(0.12, 0.025, 500);
+  }
+
+  function playLaneSound(dir){
+    if(!audioCtx) return;
+    tone(dir < 0 ? 300 : 340, 0.07, 'square', 0.035);
+    tone(dir < 0 ? 240 : 410, 0.06, 'triangle', 0.025, 0.045);
+  }
+
+  function playScanSound(){
+    if(!audioCtx) return;
+    tone(760, 0.18, 'sine', 0.035);
+    tone(980, 0.18, 'sine', 0.025, 0.04);
+  }
+
+  function playCollectSound(){
+    if(!audioCtx) return;
+    tone(780, 0.08, 'sine', 0.06);
+    tone(1040, 0.10, 'triangle', 0.055, 0.05);
+    tone(1320, 0.12, 'sine', 0.04, 0.11);
+  }
+
+  function playHitSound(){
+    if(!audioCtx) return;
+    noise(0.22, 0.08, 420);
+    tone(110, 0.22, 'sawtooth', 0.055);
+  }
+
+  function playGameOverSound(){
+    if(!audioCtx) return;
+    tone(330, 0.18, 'triangle', 0.07);
+    tone(260, 0.22, 'triangle', 0.06, 0.16);
+    tone(196, 0.35, 'sine', 0.055, 0.36);
+  }
+
+  function startBGM(){
+    if(!audioCtx || bgmTimer) return;
+    const notes = [196, 247, 294, 330, 294, 247, 220, 247];
+    bgmTimer = setInterval(() => {
+      if(!state.running || state.paused) return;
+      const root = notes[bgmStep % notes.length];
+      tone(root, 0.36, 'sine', 0.018);
+      tone(root * 2, 0.28, 'triangle', 0.012, 0.05);
+      if(bgmStep % 4 === 0) tone(root / 2, 0.55, 'sine', 0.018);
+      bgmStep++;
+    }, 520);
+  }
+
+  function startAmbientForest(){
+    if(!audioCtx || ambientTimer) return;
+    ambientTimer = setInterval(() => {
+      if(!state.running || state.paused) return;
+      noise(0.55, 0.012, 1600);
+      if(Math.random() < 0.45) {
+        const f = 950 + Math.random() * 900;
+        tone(f, 0.12, 'sine', 0.012, Math.random() * 0.2);
+        tone(f * 1.18, 0.09, 'sine', 0.009, 0.12 + Math.random() * 0.2);
+      }
+    }, 1400);
+  }
+
+  window.addEventListener('keydown', e => {
+    const k = e.key.toLowerCase();
+    if(['a','d','w','s','arrowleft','arrowright',' '].includes(k)) e.preventDefault();
+    if(!keysDown.has(k)) pressed.add(k);
+    keysDown.add(k);
+  });
+
+  window.addEventListener('keyup', e => keysDown.delete(e.key.toLowerCase()));
+
+  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('restartBtn').addEventListener('click', returnToMainMenu);
+  document.getElementById('tutorialStartBtn').addEventListener('click', startGame);
+  document.getElementById('tutorialBtn').addEventListener('click', () => showMenuScreen('tutorialScreen'));
+  document.getElementById('shopBtn').addEventListener('click', () => { renderShop(); showMenuScreen('shopScreen'); });
+  document.getElementById('codexBtn').addEventListener('click', () => showMenuScreen('codexScreen'));
+  document.getElementById('settingsBtn').addEventListener('click', () => showMenuScreen('settingsScreen'));
+  document.querySelectorAll('[data-back]').forEach(btn => btn.addEventListener('click', () => showMenuScreen('mainMenuScreen')));
+
+
+  document.querySelectorAll('[data-codex-tab]').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('[data-codex-tab]').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const target = tab.dataset.codexTab;
+      document.getElementById('codexRecordsPage').classList.toggle('hidden', target !== 'records');
+      document.getElementById('codexAchievementsPage').classList.toggle('hidden', target !== 'achievements');
+    });
+  });
+
+  document.querySelectorAll('[data-shop-tab]').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('[data-shop-tab]').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const target = tab.dataset.shopTab;
+      document.getElementById('skinShopGrid').classList.toggle('hidden', target !== 'skins');
+      document.getElementById('particleShopGrid').classList.toggle('hidden', target !== 'particles');
+    });
+  });
+
+  document.getElementById('cameraBtn').addEventListener('click', initMotionCapture);
+  document.getElementById('calibrateBtn').addEventListener('click', calibrateMotion);
+  document.getElementById('pauseBtn').addEventListener('click', pauseGame);
+  document.getElementById('resumeBtn').addEventListener('click', resumeGame);
+  document.getElementById('restartGameBtn').addEventListener('click', restartCurrentGame);
+  document.getElementById('pauseRestartBtn').addEventListener('click', restartCurrentGame);
+  document.getElementById('pauseMenuBtn').addEventListener('click', returnToMainMenu);
+
+  renderShop();
+  updateChoiceText();
+
+  function reset(){
+    state.running = true;
+    state.over = false;
+    state.paused = false;
+    state.frame = 0;
+    state.speed = 0.4125;
+    state.distance = 0;
+    state.score = 0;
+    state.lives = 3;
+    state.lane = 1;
+    state.targetLane = 1;
+    state.playerX = lanes[1];
+    state.playerY = 560;
+    state.jumpT = 0;
+    state.crouchT = 0;
+    state.scanT = 0;
+    state.scanDir = 0;
+    state.invincible = 0;
+    state.obstacles = [];
+    state.fireflies = [];
+    state.particles = [];
+    state.lastObstacleKind = 'air';
+    state.stats = { jump:0, crouch:0, leftShoulder:0, rightShoulder:0, leftTurn:0, rightTurn:0, fireCollected:0 };
+  }
+
+  function setGameControlsVisible(visible){
+    const bar = document.getElementById('gameControlBar');
+    if(bar) bar.classList.toggle('active', visible);
+  }
+
+  function pauseGame(){
+    if(!state.running || state.over) return;
+    state.paused = true;
+    const overlay = document.getElementById('pauseOverlay');
+    if(overlay) overlay.classList.add('active');
+  }
+
+  function resumeGame(){
+    if(!state.running || state.over) return;
+    state.paused = false;
+    const overlay = document.getElementById('pauseOverlay');
+    if(overlay) overlay.classList.remove('active');
+  }
+
+  function returnToMainMenu(){
+    state.running = false;
+    state.paused = false;
+    state.over = false;
+    state.paused = false;
+    setGameControlsVisible(false);
+    const pause = document.getElementById('pauseOverlay');
+    if(pause) pause.classList.remove('active');
+    document.getElementById('endOverlay').classList.add('hidden');
+    document.getElementById('startOverlay').classList.remove('hidden');
+    showMenuScreen('mainMenuScreen');
+  }
+
+  function restartCurrentGame(){
+    const pause = document.getElementById('pauseOverlay');
+    if(pause) pause.classList.remove('active');
+    startGame();
+  }
+
+  function startGame(){
+    initAudio();
+    reset();
+    const pause = document.getElementById('pauseOverlay');
+    if(pause) pause.classList.remove('active');
+    document.getElementById('startOverlay').classList.add('hidden');
+    document.getElementById('endOverlay').classList.add('hidden');
+    setGameControlsVisible(true);
+  }
+
+  function update(){
+    if(!state.running || state.paused) return;
+    state.frame++;
+    state.distance += state.speed * 0.55;
+    state.speed = Math.min(0.6375, 0.4125 + state.distance / 10400);
+    if(state.invincible > 0) state.invincible--;
+
+    handleInput();
+    updatePlayer();
+    spawnThings();
+    updateObjects();
+    updateParticles();
+  }
+
+  function doMoveLeft(){
+    if(state.paused || !state.running) return;
+    state.targetLane = Math.max(0, state.targetLane - 1);
+    state.stats.leftShoulder++;
+    playLaneSound(-1);
+  }
+
+  function doMoveRight(){
+    if(state.paused || !state.running) return;
+    state.targetLane = Math.min(2, state.targetLane + 1);
+    state.stats.rightShoulder++;
+    playLaneSound(1);
+  }
+
+  function doJump(){
+    if(state.paused || !state.running) return;
+    if(state.jumpT <= 0) {
+      state.jumpT = 240;
+      state.crouchT = 0;
+      state.stats.jump++;
+      playJumpSound();
+    }
+  }
+
+  function doCrouch(){
+    if(state.paused || !state.running) return;
+    if(state.jumpT <= 0) {
+      state.crouchT = 293;
+      state.stats.crouch++;
+      playCrouchSound();
+    }
+  }
+
+  function doScanLeft(){
+    if(state.paused || !state.running) return;
+    state.scanT = 60;
+    state.scanDir = -1;
+    state.stats.leftTurn++;
+    playScanSound();
+  }
+
+  function doScanRight(){
+    if(state.paused || !state.running) return;
+    state.scanT = 60;
+    state.scanDir = 1;
+    state.stats.rightTurn++;
+    playScanSound();
+  }
+
+  function handleInput(){
+    if(state.paused) { pressed.clear(); motionPressed.clear(); return; }
+    if(pressed.has('a') || motionPressed.has('left')) doMoveLeft();
+    if(pressed.has('d') || motionPressed.has('right')) doMoveRight();
+    if(pressed.has('w') || motionPressed.has('jump')) doJump();
+    if(pressed.has('s') || motionPressed.has('crouch')) doCrouch();
+    if(pressed.has('arrowleft') || motionPressed.has('scanLeft')) doScanLeft();
+    if(pressed.has('arrowright') || motionPressed.has('scanRight')) doScanRight();
+
+    pressed.clear();
+    motionPressed.clear();
+  }
+
+  function updatePlayer(){
+    state.lane = state.targetLane;
+    const tx = lanes[state.targetLane];
+    state.playerX += (tx - state.playerX) * 0.22;
+    if(state.jumpT > 0) state.jumpT--;
+    if(state.crouchT > 0) state.crouchT--;
+    if(state.scanT > 0) state.scanT--;
+
+    if(state.running && state.frame % 5 === 0) {
+      createTrailParticle(state.playerX, state.playerY - 34);
+    }
+  }
+
+  function spawnThings(){
+    if(state.frame % 600 === 0) {
+      const lane = Math.floor(Math.random() * 3);
+      const kind = state.lastObstacleKind === 'ground' ? 'air' : 'ground';
+      state.lastObstacleKind = kind;
+      state.obstacles.push({ lane, x: lanes[lane], y: -40, kind, hit: false });
+    }
+
+    if(state.frame % 144 === 0) {
+      const lane = Math.floor(Math.random() * 3);
+      const side = Math.random() < 0.5 ? -1 : 1;
+      state.fireflies.push({ lane, side, x: lanes[lane] + side * 42, y: -20, glow: Math.random()*10 });
+    }
+  }
+
+  function updateObjects(){
+    for(const o of state.obstacles) o.y += state.speed;
+    for(const f of state.fireflies) f.y += state.speed;
+
+    state.obstacles = state.obstacles.filter(o => o.y < H + 80 && !o.remove);
+    state.fireflies = state.fireflies.filter(f => f.y < H + 40 && !f.remove);
+
+    const p = getPlayerBox();
+    for(const o of state.obstacles) {
+      const box = getObstacleBox(o);
+      if(rectsOverlap(p, box) && state.invincible <= 0) {
+        const playerIsJumping = state.jumpT > 0;
+        const earlyJumpBuffer = o.kind === 'ground' && state.jumpT > 0 && o.y > state.playerY - 260;
+        const crouchBuffer = o.kind === 'air' && state.crouchT > 0 && o.y > state.playerY - 320;
+        const safe = (o.kind === 'ground' && (playerIsJumping || earlyJumpBuffer)) || (o.kind === 'air' && crouchBuffer);
+        if(!safe) {
+          state.lives--;
+          playHitSound();
+          state.invincible = 72;
+          o.remove = true;
+          burst(state.playerX, state.playerY - 20, '#ff7676', 14);
+          if(state.lives <= 0) endGame();
+        }
+      }
+    }
+
+    for(const f of state.fireflies) {
+      const rayActive = state.scanT > 0 && state.scanDir === f.side;
+      const rayY = state.playerY - 36;
+      const rayStartX = state.playerX + state.scanDir * 16;
+      const rayEndX = state.playerX + state.scanDir * 130;
+      const minX = Math.min(rayStartX, rayEndX);
+      const maxX = Math.max(rayStartX, rayEndX);
+      const fireflyRadius = 22;
+
+      const hitByScanRay =
+        rayActive &&
+        f.x >= minX - fireflyRadius &&
+        f.x <= maxX + fireflyRadius &&
+        Math.abs(f.y - rayY) <= 95;
+
+      if(hitByScanRay) {
+        f.remove = true;
+        state.score += 50;
+        state.stats.fireCollected++;
+        playCollectSound();
+        burst(f.x, f.y, '#ffd36b', 10);
+      }
+    }
+  }
+
+  function updateParticles(){
+    for(const p of state.particles){ p.x += p.vx; p.y += p.vy; p.life--; }
+    state.particles = state.particles.filter(p => p.life > 0);
+  }
+
+  function endGame(){
+    state.running = false;
+    state.over = true;
+    playGameOverSound();
+    setGameControlsVisible(false);
+    const report = makeReport();
+    document.getElementById('gradeText').textContent = `${report.grade} / ${report.score}分`;
+    document.getElementById('commentText').textContent = report.comment;
+    document.getElementById('reportGrid').innerHTML = `
+      <div class="stat">本局得分：${state.score}</div>
+      <div class="stat">奔跑距离：${Math.floor(state.distance)}m</div>
+      <div class="stat">收集萤火：${state.stats.fireCollected}个</div>
+      <div class="stat">剩余生命：${state.lives}</div>
+      <div class="stat">仰头跳跃：${state.stats.jump}次</div>
+      <div class="stat">低头下蹲：${state.stats.crouch}次</div>
+      <div class="stat">左肩激活：${state.stats.leftShoulder}次</div>
+      <div class="stat">右肩激活：${state.stats.rightShoulder}次</div>
+      <div class="stat">左转扫视：${state.stats.leftTurn}次</div>
+      <div class="stat">右转扫视：${state.stats.rightTurn}次</div>
+    `;
+    document.getElementById('endOverlay').classList.remove('hidden');
+  }
+
+  function makeReport(){
+    const s = state.stats;
+    const totalMoves = s.jump + s.crouch + s.leftShoulder + s.rightShoulder + s.leftTurn + s.rightTurn;
+    const balanceShoulder = Math.abs(s.leftShoulder - s.rightShoulder);
+    const balanceTurn = Math.abs(s.leftTurn - s.rightTurn);
+    let score = 55 + Math.min(25, totalMoves * 1.2) + Math.min(15, s.fireCollected * 0.9) - balanceShoulder * 1.3 - balanceTurn * 1.1;
+    score = Math.max(60, Math.min(100, Math.round(score)));
+    const grade = score >= 95 ? 'A+' : score >= 88 ? 'A' : score >= 78 ? 'B+' : score >= 68 ? 'B' : 'C';
+    let comment = '本局肩颈活动完成良好，颈部前后与左右方向都得到了基础舒展。';
+    if(score >= 95) comment = '今日肩颈活动非常均衡，森林漫行状态优秀，放松效果很充分。';
+    else if(balanceShoulder > 5) comment = '肩部左右激活略不均衡，下一局可以有意识地多练较少一侧。';
+    else if(balanceTurn > 5) comment = '颈部左右扫视略不均衡，建议保持缓慢、平稳、对称的转头动作。';
+    return { score, grade, comment };
+  }
+
+  function getPlayerBox(){
+    const jumpOffset = state.jumpT > 0 ? -Math.sin((state.jumpT / 240) * Math.PI) * 150 : 0;
+    const crouch = state.crouchT > 0;
+    return { x: state.playerX - 18, y: state.playerY - 52 + jumpOffset + (crouch ? 20 : 0), w: 36, h: crouch ? 34 : 56 };
+  }
+
+  function getObstacleBox(o){
+    if(o.kind === 'ground') return { x: o.x - 18, y: o.y - 10, w: 36, h: 18 };
+    return { x: o.x - 48, y: o.y - 40, w: 96, h: 38 };
+  }
+
+  function rectsOverlap(a,b){ return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y; }
+  function pointInRect(x,y,r){ return x >= r.x && x <= r.x+r.w && y >= r.y && y <= r.y+r.h; }
+  function burst(x,y,color,n){
+    for(let i=0;i<n;i++) state.particles.push({x,y,color,life:28+Math.random()*16,vx:(Math.random()-.5)*3,vy:(Math.random()-.5)*3});
+  }
+
+  function draw(){
+    drawBackground();
+    drawRoad();
+    drawObjects();
+    drawPlayer();
+    drawParticles();
+    drawHUD();
+    if(!state.running && !state.over) drawAttract();
+  }
+
+  function drawBackground(){
+    const g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0, '#173e26'); g.addColorStop(0.55, '#102b1b'); g.addColorStop(1, '#07120d');
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+
+    const offset = (state.frame * state.speed) % 96;
+    for(let y = -96 + offset; y < H + 96; y += 96){
+      drawTree(48, y, 1.1); drawTree(420, y + 42, 1.0); drawBush(84, y + 64); drawBush(392, y + 16);
+    }
+
+    ctx.globalAlpha = 0.12; ctx.fillStyle = '#ffe6a0';
+    for(let i=0;i<3;i++) {
+      const x = 88 + i*130 + Math.sin((state.frame+i*30)/80)*20;
+      ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x+55,H); ctx.lineTo(x+8,H); ctx.lineTo(x-40,0); ctx.closePath(); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawRoad(){
+    pixelRect(108, 0, 264, H, '#6a4c2d');
+    pixelRect(118, 0, 244, H, '#8a663c');
+    pixelRect(128, 0, 224, H, '#9d7443');
+
+    const offset = (state.frame * state.speed) % 48;
+    for(const x of [195, 285]){
+      for(let y = -48 + offset; y < H; y += 48){ pixelRect(x-2, y, 4, 24, '#d6ba76'); }
+    }
+
+    for(let y = -32 + offset; y < H; y += 32){
+      pixelRect(104, y, 10, 12, '#4a9f5a');
+      pixelRect(366, y+12, 10, 12, '#4a9f5a');
+    }
+  }
+
+  function drawObjects(){
+    for(const f of state.fireflies) drawFirefly(f);
+    for(const o of state.obstacles) drawObstacle(o);
+  }
+
+  function drawPlayer(){
+    const p = getPlayerBox();
+    const blink = state.invincible > 0 && Math.floor(state.frame/5)%2 === 0;
+    if(blink) return;
+    const x = state.playerX;
+    const y = p.y + 50;
+    const run = Math.floor(state.frame / 10) % 2;
+    const crouch = state.crouchT > 0;
+    const skin = getSelectedSkin();
+
+    ctx.globalAlpha = 0.25; pixelRect(x-22, state.playerY+2, 44, 10, '#000000'); ctx.globalAlpha = 1;
+
+    if(skin.glow) {
+      ctx.globalAlpha = skin.id === 'envoy' ? 0.34 : 0.22;
+      ctx.fillStyle = skin.glow;
+      ctx.beginPath();
+      ctx.arc(x, y-34, skin.id === 'envoy' ? 34 : 26, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      if(skin.id === 'envoy') {
+        ctx.strokeStyle = '#ffe08a';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(x, y-67, 16, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+
+    if(state.scanT > 0) drawScanRay(x + state.scanDir * 12, y - 49, state.scanDir);
+
+    if(crouch) {
+      pixelRect(x-15, y-30, 30, 24, skin.body);
+      pixelRect(x-11, y-42, 22, 18, '#f2c08a');
+      pixelRect(x-18, y-12, 36, 8, skin.trim);
+      return;
+    }
+
+    pixelRect(x-11, y-58, 22, 20, '#f2c08a');
+    pixelRect(x-13, y-62, 26, 8, skin.hair);
+    pixelRect(x-7, y-52, 4, 4, '#10291d');
+    pixelRect(x+5, y-52, 4, 4, '#10291d');
+    pixelRect(x-14, y-38, 28, 32, skin.body);
+    pixelRect(x-10, y-34, 20, 8, skin.trim);
+    if(skin.level >= 5) {
+      pixelRect(x-20, y-36, 6, 30, skin.trim);
+      pixelRect(x+14, y-36, 6, 30, skin.trim);
+    }
+    pixelRect(x-22, y-34 + run*5, 8, 22, '#f2c08a');
+    pixelRect(x+14, y-29 - run*5, 8, 22, '#f2c08a');
+    pixelRect(x-13, y-6, 10, 24 + run*4, '#243e7f');
+    pixelRect(x+3, y-6, 10, 24 - run*4, '#243e7f');
+    pixelRect(x-16, y+18+run*4, 16, 6, '#1b263f');
+    pixelRect(x+2, y+18-run*4, 16, 6, '#1b263f');
+  }
+
+  function drawScanRay(x, y, dir){
+    const length = 130;
+    const endX = x + dir * length;
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+
+    const glow = ctx.createLinearGradient(x, y, endX, y);
+    glow.addColorStop(0, 'rgba(255, 245, 175, 0.95)');
+    glow.addColorStop(0.45, 'rgba(255, 211, 107, 0.62)');
+    glow.addColorStop(1, 'rgba(255, 211, 107, 0.03)');
+
+    ctx.strokeStyle = glow;
+    ctx.lineWidth = 9;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(endX, y);
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(255, 248, 205, 0.95)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(endX, y);
+    ctx.stroke();
+
+    for(let i = 0; i < 5; i++){
+      const t = (i + 1) / 6;
+      const px = x + dir * length * t;
+      const py = y + Math.sin((state.frame + i * 8) / 8) * 5;
+      ctx.globalAlpha = 0.75 - t * 0.35;
+      ctx.fillStyle = '#fff2ad';
+      ctx.beginPath();
+      ctx.arc(px, py, 2.5 + (1 - t) * 1.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+    ctx.globalAlpha = 1;
+  }
+
+  function drawJumpCue(x, y){
+    if(y < 40 || y > H - 40) return;
+    ctx.globalAlpha = 0.78;
+    pixelRect(x-18, y-6, 36, 6, '#ffd36b');
+    pixelRect(x-10, y-14, 20, 8, '#fff2ad');
+    pixelRect(x-4, y-22, 8, 8, '#ffd36b');
+    ctx.fillStyle = '#ffd36b';
+    ctx.font = '12px Microsoft YaHei, Arial';
+    ctx.fillText('W', x - 5, y - 28);
+    ctx.globalAlpha = 1;
+  }
+
+  function drawCrouchCue(x, y){
+    if(y < 40 || y > H - 40) return;
+    ctx.globalAlpha = 0.78;
+    pixelRect(x-22, y-6, 44, 6, '#7ee6a6');
+    pixelRect(x-14, y-14, 28, 8, '#caffd8');
+    pixelRect(x-6, y-22, 12, 8, '#7ee6a6');
+    ctx.fillStyle = '#caffd8';
+    ctx.font = '12px Microsoft YaHei, Arial';
+    ctx.fillText('S', x - 4, y - 28);
+    ctx.globalAlpha = 1;
+  }
+
+  function drawObstacle(o){
+    if(o.kind === 'ground') {
+      drawJumpCue(o.x, o.y + 92);
+      pixelRect(o.x-24, o.y-12, 48, 28, '#7b4a22');
+      pixelRect(o.x-18, o.y-20, 36, 12, '#9b6b34');
+      pixelRect(o.x-12, o.y-17, 24, 6, '#d39a4d');
+      pixelRect(o.x-31, o.y+6, 18, 14, '#6f7168');
+      pixelRect(o.x+17, o.y+3, 16, 16, '#8c8f82');
+    } else {
+      drawCrouchCue(o.x, o.y + 105);
+      pixelRect(o.x-48, o.y-22, 96, 12, '#5b351b');
+      pixelRect(o.x-38, o.y-10, 8, 34, '#3f8d45');
+      pixelRect(o.x+12, o.y-10, 8, 42, '#3f8d45');
+      pixelRect(o.x+28, o.y-4, 10, 24, '#75b95e');
+    }
+  }
+
+  function drawFirefly(f){
+    const pulse = 0.65 + Math.sin((state.frame + f.glow) / 10) * 0.25;
+    ctx.globalAlpha = 0.22 * pulse; ctx.fillStyle = '#ffd36b';
+    ctx.beginPath(); ctx.arc(f.x, f.y, 20, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 1;
+    pixelRect(f.x-5, f.y-5, 10, 10, '#ffd36b');
+    pixelRect(f.x-2, f.y-9, 4, 18, '#fff2ad');
+    pixelRect(f.x-9, f.y-2, 18, 4, '#fff2ad');
+  }
+
+  function drawParticles(){
+    for(const p of state.particles){
+      if(p.type) {
+        drawCustomParticle(p);
+      } else {
+        ctx.globalAlpha = Math.max(0, p.life/40);
+        pixelRect(p.x, p.y, 4, 4, p.color);
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawHUD(){
+    ctx.fillStyle = 'rgba(8, 20, 13, .72)';
+    roundRect(14, 14, 452, 68, 12, true);
+    ctx.fillStyle = '#f4e6bf';
+    ctx.font = '18px Microsoft YaHei, Arial';
+    ctx.fillText(`分数 ${state.score}`, 30, 42);
+    ctx.fillText(`距离 ${Math.floor(state.distance)}m`, 178, 42);
+    ctx.fillText(`生命`, 322, 42);
+    for(let i=0;i<3;i++) drawHeart(372+i*28, 35, i < state.lives);
+
+    ctx.fillStyle = 'rgba(8, 20, 13, .62)';
+    roundRect(16, H-54, 448, 38, 10, true);
+    ctx.fillStyle = '#d8f0ce';
+    ctx.font = '13px Microsoft YaHei, Arial';
+    ctx.fillText('键盘备用：A/D换道 W跳 S蹲 ←/→扫视｜动捕：肩倾/下巴肩距/左右转头', 32, H-30);
+  }
+
+  function drawHeart(x,y,on){
+    const c = on ? '#ff6b6b' : '#4f6254';
+    pixelRect(x-6,y-6,6,6,c); pixelRect(x+0,y-6,6,6,c);
+    pixelRect(x-9,y,18,6,c); pixelRect(x-6,y+6,12,6,c); pixelRect(x-3,y+12,6,6,c);
+  }
+
+  function drawTree(x,y,s){
+    pixelRect(x-12*s,y+26*s,24*s,36*s,'#5a351b');
+    pixelRect(x-34*s,y,68*s,32*s,'#276239');
+    pixelRect(x-44*s,y+20*s,88*s,36*s,'#347846');
+    pixelRect(x-26*s,y-16*s,52*s,28*s,'#3d9152');
+  }
+
+  function drawBush(x,y){
+    pixelRect(x-20,y+10,40,18,'#2e6d3d');
+    pixelRect(x-12,y,28,18,'#409454');
+    pixelRect(x+8,y+8,22,14,'#5fbf72');
+  }
+
+  function drawAttract(){
+    ctx.fillStyle = 'rgba(0,0,0,.28)';
+    ctx.fillRect(0,0,W,H);
+  }
+
+  function pixelRect(x,y,w,h,color){
+    ctx.fillStyle = color;
+    ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+  }
+
+  function roundRect(x,y,w,h,r,fill){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+    if(fill) ctx.fill();
+  }
+
+  function loop(){
+    update();
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  loop();
+})();
+</script>
+</body>
+</html>
