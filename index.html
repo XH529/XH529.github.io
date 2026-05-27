@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>个人作品集 | Portfolio</title>
+  <style>
+    :root {
+      --bg: #07110d;
+      --bg-2: #0b1a13;
+      --card: rgba(14, 34, 25, 0.76);
+      --card-2: rgba(18, 45, 32, 0.9);
+      --green: #45ff9a;
+      --green-2: #10c977;
+      --green-3: #9cffc8;
+      --text: #e9fff3;
+      --muted: #91ad9c;
+      --line: rgba(69, 255, 154, 0.18);
+      --shadow: 0 0 40px rgba(69, 255, 154, 0.12);
+      --radius: 26px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(69, 255, 154, 0.18), transparent 30%),
+        radial-gradient(circle at 80% 40%, rgba(16, 201, 119, 0.12), transparent 32%),
+        linear-gradient(180deg, #050907 0%, var(--bg) 42%, #050806 100%);
+      color: var(--text);
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(69, 255, 154, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(69, 255, 154, 0.04) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.08));
+      z-index: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .site-nav {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      width: min(920px, calc(100% - 32px));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(3, 12, 8, 0.68);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      font-size: 14px;
+    }
+
+    .brand-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 18px var(--green);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .nav-links a {
+      padding: 8px 12px;
+      border-radius: 999px;
+      transition: 0.25s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+      background: rgba(69, 255, 154, 0.12);
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      padding: 118px max(24px, 7vw) 72px;
+      display: flex;
+      align-items: center;
+    }
+
+    .container {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 56px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+      padding: 9px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--green-3);
+      background: rgba(69, 255, 154, 0.08);
+      font-size: 13px;
+      letter-spacing: 0.06em;
+    }
+
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 16px var(--green);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.8); opacity: 0.45; }
+    }
+
+    h1 {
+      font-size: clamp(48px, 8vw, 104px);
+      line-height: 0.95;
+      letter-spacing: -0.07em;
+      margin-bottom: 28px;
+    }
+
+    .gradient-text {
+      color: transparent;
+      background: linear-gradient(90deg, var(--text), var(--green), #6cf7ff);
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+
+    .hero-desc {
+      max-width: 660px;
+      color: var(--muted);
+      font-size: clamp(16px, 2vw, 20px);
+      line-height: 1.8;
+      margin-bottom: 36px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 48px;
+      padding: 0 20px;
+      border-radius: 999px;
+      font-weight: 700;
+      transition: 0.25s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      color: #041009;
+      background: var(--green);
+      box-shadow: 0 0 28px rgba(69, 255, 154, 0.28);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 42px rgba(69, 255, 154, 0.42);
+    }
+
+    .btn-ghost {
+      color: var(--green-3);
+      border: 1px solid var(--line);
+      background: rgba(69, 255, 154, 0.06);
+    }
+
+    .btn-ghost:hover {
+      color: var(--text);
+      background: rgba(69, 255, 154, 0.12);
+    }
+
+    .orb-card {
+      position: relative;
+      min-height: 460px;
+      border: 1px solid var(--line);
+      border-radius: 36px;
+      background:
+        linear-gradient(160deg, rgba(69, 255, 154, 0.16), transparent 46%),
+        rgba(4, 14, 9, 0.72);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .orb-card::before {
+      content: "";
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(69, 255, 154, 0.42), rgba(69, 255, 154, 0.08) 48%, transparent 70%);
+      filter: blur(4px);
+    }
+
+    .orb-lines {
+      position: absolute;
+      inset: 38px;
+      border: 1px solid rgba(69, 255, 154, 0.2);
+      border-radius: 50%;
+      animation: rotate 18s linear infinite;
+    }
+
+    .orb-lines::before,
+    .orb-lines::after {
+      content: "";
+      position: absolute;
+      inset: 42px;
+      border: 1px dashed rgba(69, 255, 154, 0.22);
+      border-radius: 50%;
+    }
+
+    .orb-lines::after {
+      inset: 92px;
+      border-style: solid;
+    }
+
+    @keyframes rotate {
+      to { transform: rotate(360deg); }
+    }
+
+    .status-panel {
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      bottom: 28px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(3, 12, 8, 0.72);
+      backdrop-filter: blur(16px);
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(69, 255, 154, 0.1);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .status-row:last-child {
+      border-bottom: 0;
+    }
+
+    .status-row strong {
+      color: var(--green-3);
+    }
+
+    .section-head {
+      margin-bottom: 38px;
+    }
+
+    .section-kicker {
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      font-size: clamp(34px, 5vw, 64px);
+      line-height: 1.05;
+      letter-spacing: -0.05em;
+      margin-bottom: 18px;
+    }
+
+    .section-desc {
+      max-width: 780px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.9;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 0;
+      overflow: hidden;
+      min-height: 620px;
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    
+
+    
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .profile-card,
+    .info-card,
+    .project-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .about-grid .profile-card,
+    .about-grid .info-card {
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+
+    .profile-card {
+      padding: 28px;
+      border-right: 1px solid rgba(69, 255, 154, 0.14) !important;
+      background:
+        radial-gradient(circle at 25% 20%, rgba(69, 255, 154, 0.16), transparent 30%),
+        rgba(4, 14, 9, 0.36) !important;
+    }
+
+    .avatar-placeholder {
+      height: 390px;
+      border-radius: 22px;
+      border: 1px solid rgba(69, 255, 154, 0.24);
+      background: rgba(0, 0, 0, 0.18);
+      overflow: hidden;
+      margin-bottom: 22px;
+    }
+
+    .profile-photo {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: center 28%;
+      filter: saturate(0.95) contrast(1.02);
+    }
+
+    .award-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .award-item {
+      padding: 11px 13px;
+      border: 1px solid rgba(69, 255, 154, 0.16);
+      border-radius: 14px;
+      color: var(--green-3);
+      background: rgba(69, 255, 154, 0.055);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .info-card {
+      padding: clamp(28px, 5vw, 56px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 18px;
+    }
+
+    .about-name {
+      font-size: clamp(38px, 5vw, 70px);
+      line-height: 1;
+      letter-spacing: -0.06em;
+      margin-bottom: 4px;
+    }
+
+    .about-subtitle {
+      color: var(--green-3);
+      font-size: 17px;
+      margin-bottom: 24px;
+    }
+
+    .info-item {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 18px;
+      padding: 18px 0;
+      border-bottom: 1px solid rgba(69, 255, 154, 0.11);
+    }
+
+    .info-item:last-child {
+      border-bottom: 0;
+    }
+
+    .info-label {
+      color: var(--green-3);
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .info-value {
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    .project-page {
+      align-items: stretch;
+    }
+
+    .project-card {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 0;
+      overflow: hidden;
+      min-height: 620px;
+      width: 100%;
+    }
+
+    .project-media {
+      padding: 28px;
+      border-right: 1px solid rgba(69, 255, 154, 0.14);
+      background:
+        radial-gradient(circle at 25% 20%, rgba(69, 255, 154, 0.16), transparent 30%),
+        rgba(4, 14, 9, 0.36);
+      display: grid;
+      gap: 18px;
+    }
+
+    .media-main,
+    .video-box,
+    .link-box {
+      border: 1px dashed rgba(69, 255, 154, 0.35);
+      border-radius: 22px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: var(--muted);
+      background: rgba(0, 0, 0, 0.18);
+      line-height: 1.7;
+      overflow: hidden;
+    }
+
+    .project-image,
+    .project-video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .playable-link {
+      border-style: solid;
+      background:
+        radial-gradient(circle at 50% 20%, rgba(69, 255, 154, 0.2), transparent 42%),
+        rgba(69, 255, 154, 0.07);
+    }
+
+    .play-link {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--green-3);
+      transition: 0.25s ease;
+    }
+
+    .play-link span {
+      font-size: 12px;
+      letter-spacing: 0.22em;
+      color: var(--green);
+    }
+
+    .play-link strong {
+      font-size: 22px;
+      color: var(--text);
+    }
+
+    .play-link small {
+      color: var(--muted);
+    }
+
+    .play-link:hover {
+      transform: translateY(-2px);
+      background: rgba(69, 255, 154, 0.08);
+    }
+
+    .media-main {
+      min-height: 330px;
+    }
+
+    .media-small-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .video-box,
+    .link-box {
+      min-height: 150px;
+      padding: 18px;
+    }
+
+    .project-content {
+      padding: clamp(28px, 5vw, 56px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .project-number {
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      color: #041009;
+      background: var(--green);
+      font-weight: 900;
+      margin-bottom: 26px;
+      box-shadow: 0 0 28px rgba(69, 255, 154, 0.26);
+    }
+
+    h3 {
+      font-size: clamp(30px, 4vw, 54px);
+      line-height: 1.05;
+      letter-spacing: -0.05em;
+      margin-bottom: 22px;
+    }
+
+    .project-text {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.9;
+      margin-bottom: 28px;
+    }
+
+    .spec-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .spec {
+      padding: 14px;
+      border: 1px solid rgba(69, 255, 154, 0.14);
+      border-radius: 16px;
+      background: rgba(69, 255, 154, 0.045);
+    }
+
+    .spec span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .spec strong {
+      color: var(--green-3);
+      font-size: 14px;
+    }
+
+    .detail-panel {
+      display: none;
+      margin-top: 22px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(69, 255, 154, 0.06);
+      color: var(--muted);
+      line-height: 1.85;
+    }
+
+    .detail-panel:target {
+      display: block;
+    }
+
+    .footer {
+      min-height: 50vh;
+      padding: 72px max(24px, 7vw);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .footer strong {
+      color: var(--green-3);
+    }
+
+    @media (max-width: 900px) {
+      .site-nav {
+        align-items: flex-start;
+        border-radius: 24px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hero,
+      .about-grid,
+      .project-card {
+        grid-template-columns: 1fr;
+      }
+
+      .profile-card {
+        border-right: 0 !important;
+        border-bottom: 1px solid rgba(69, 255, 154, 0.14) !important;
+      }
+
+      .project-media {
+        border-right: 0;
+        border-bottom: 1px solid rgba(69, 255, 154, 0.14);
+      }
+
+      .orb-card {
+        min-height: 360px;
+      }
+
+      .info-item {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .page {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .media-small-grid,
+      .spec-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a class="brand" href="#cover" aria-label="返回封面">
+      <span class="brand-dot"></span>
+      <span>PORTFOLIO</span>
+    </a>
+    <div class="nav-links">
+      <a href="#about">个人介绍</a>
+      <a href="#project-01">作品一</a>
+      <a href="#project-02">作品二</a>
+      <a href="#project-03">作品三</a>
+    </div>
+  </nav>
+
+  <main>
+    <!-- 第 1 页：封面页 -->
+    <section id="cover" class="page">
+      <div class="container hero">
+        <div>
+          <div class="eyebrow"><span class="pulse"></span> Intelligent Interaction / Embedded Development</div>
+          <h1>个人作品集<br><span class="gradient-text">Portfolio</span></h1>
+          <p class="hero-desc">
+            这里用于展示你的智能交互、嵌入式开发、硬件原型与数字媒体项目。你可以把它发布到 GitHub Pages，作为面试、参赛、课程展示或个人主页使用。
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#project-01">查看作品</a>
+            <a class="btn btn-ghost" href="#about">了解我</a>
+          </div>
+        </div>
+
+        <div class="orb-card" aria-label="科技视觉装饰">
+          <div class="orb-lines"></div>
+          <div class="status-panel">
+            <div class="status-row"><span>Focus</span><strong>智能交互</strong></div>
+            <div class="status-row"><span>Hardware</span><strong>嵌入式开发</strong></div>
+            <div class="status-row"><span>Prototype</span><strong>作品原型 / Demo</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第 2 页：个人介绍页 -->
+    <section id="about" class="page project-page">
+      <div class="container about-grid">
+        <div class="profile-card">
+          <div class="avatar-placeholder">
+            <img class="profile-photo" src="/mnt/data/9d332e5dc427e3865db4f54ef1c6a035.jpg" alt="徐浩个人照片">
+          </div>
+          <div class="award-list">
+            <div class="award-item">“装备中国”高端装备创新设计大赛优秀奖</div>
+            <div class="award-item">全国大学生工业设计大赛山东赛区一等奖</div>
+            <div class="award-item">全国大学生工业设计大赛山东赛区三等奖（3项）</div>
+            <div class="award-item">山东省大学生机电产品创新设计竞赛二等奖</div>
+            <div class="award-item">山东省大学生机电产品创新设计竞赛三等奖</div>
+            <div class="award-item">山东省大学生工业设计大赛三等奖</div>
+            <div class="award-item">山东省大学生科技创新大赛校级二等奖</div>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="section-kicker">About Me</div>
+          <h2 class="about-name">徐浩</h2>
+          <div class="about-subtitle">工业设计工程 / 智能交互 / 嵌入式开发</div>
+
+          <div class="info-item">
+            <div class="info-label">院校专业</div>
+            <div class="info-value">北京工业大学｜工业设计工程专业</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">出生年月</div>
+            <div class="info-value">2003年5月</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">联系方式</div>
+            <div class="info-value">手机：177-0633-1546<br>邮箱：1633145881@qq.com</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">校园荣誉</div>
+            <div class="info-value">省政府励志奖学金、二等奖学金、优秀班干部、年度励志“橙阳”人物、社会实践先进个人、志愿服务先进个人</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第 3 页：作品一 -->
+    <section id="project-01" class="page project-page">
+      <div class="container project-card">
+        <div class="project-media">
+          <div class="media-main">
+            <img class="project-image" src="project1/cover.png" alt="颈野漫行 Neckscape 项目封面">
+          </div>
+          <div class="media-small-grid">
+            <div class="video-box">
+              <video class="project-video" controls muted loop playsinline poster="project1/cover.png">
+                <source src="project1/demo.mp4" type="video/mp4">
+                当前浏览器不支持视频播放。
+              </video>
+            </div>
+            <div class="link-box playable-link">
+              <a class="play-link" href="project1/neckscape.html" target="_blank" rel="noopener">
+                <span>PLAY</span>
+                <strong>开始试玩</strong>
+                <small>打开 HTML 游戏</small>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="project-content">
+          <div class="project-number">01</div>
+          <h3>颈野漫行 Neckscape</h3>
+          <p class="project-text">《颈野漫行 Neckscape》是一款融合肩颈放松训练与像素冒险玩法的体感交互游戏。玩家通过抬肩、侧颈拉伸、转头等动作驱动角色穿越森林秘境，在完成游戏挑战的同时进行肩颈舒缓训练。</p>
+          <div class="spec-grid">
+            <div class="spec"><span>类型</span><strong>体感交互游戏</strong></div>
+            <div class="spec"><span>技术</span><strong>HTML / JavaScript</strong></div>
+            <div class="spec"><span>方向</span><strong>健康行为设计</strong></div>
+            <div class="spec"><span>视觉</span><strong>像素风 / 森林秘境</strong></div>
+          </div>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="project1/neckscape.html" target="_blank" rel="noopener">开始试玩</a>
+            <a class="btn btn-ghost" href="#detail-01">查看详情</a>
+          </div>
+          <div id="detail-01" class="detail-panel">
+            <strong>项目说明：</strong>项目围绕肩颈放松场景展开，将训练动作转化为游戏操作，把健康行为融入闯关体验。本人负责游戏概念设定、视觉风格设计、交互流程设计、前端开发与原型测试。后续可继续接入摄像头识别、传感器数据或嵌入式设备，实现更完整的体感交互系统。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第 4 页：作品二 -->
+    <section id="project-02" class="page project-page">
+      <div class="container project-card">
+        <div class="project-media">
+          <div class="media-main">
+            <div>
+              <strong>作品主图占位</strong><br>
+              可放硬件结构图、交互流程图、实验照片
+            </div>
+          </div>
+          <div class="media-small-grid">
+            <div class="video-box">
+              <div><strong>视频占位</strong><br>项目演示 / 交互录屏</div>
+            </div>
+            <div class="link-box">
+              <div><strong>链接占位</strong><br>在线 Demo / 代码仓库</div>
+            </div>
+          </div>
+        </div>
+        <div class="project-content">
+          <div class="project-number">02</div>
+          <h3>作品名称二</h3>
+          <p class="project-text">这里填写第二个作品的概述。可以强调技术难点，例如数据采集、实时反馈、控制逻辑、硬件调试、交互体验优化等。</p>
+          <div class="spec-grid">
+            <div class="spec"><span>类型</span><strong>嵌入式开发</strong></div>
+            <div class="spec"><span>技术</span><strong>STM32 / Arduino / Sensor</strong></div>
+            <div class="spec"><span>输出</span><strong>硬件原型 / 演示视频</strong></div>
+            <div class="spec"><span>亮点</span><strong>实时交互反馈</strong></div>
+          </div>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#detail-02">查看详情</a>
+            <a class="btn btn-ghost" href="#project-03">下一个作品</a>
+          </div>
+          <div id="detail-02" class="detail-panel">
+            <strong>详情内容占位：</strong>这里可以添加系统架构图、硬件清单、关键代码片段、测试数据、视频链接和项目总结。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第 5 页：作品三 -->
+    <section id="project-03" class="page project-page">
+      <div class="container project-card">
+        <div class="project-media">
+          <div class="media-main">
+            <div>
+              <strong>作品主图占位</strong><br>
+              可放最终展示照片、网页截图、产品效果图
+            </div>
+          </div>
+          <div class="media-small-grid">
+            <div class="video-box">
+              <div><strong>视频占位</strong><br>功能展示 / 用户体验过程</div>
+            </div>
+            <div class="link-box">
+              <div><strong>链接占位</strong><br>项目主页 / GitHub / 论文说明</div>
+            </div>
+          </div>
+        </div>
+        <div class="project-content">
+          <div class="project-number">03</div>
+          <h3>作品名称三</h3>
+          <p class="project-text">这里填写第三个作品的简介。建议重点写清楚你的个人贡献、最终成果和作品价值，让浏览者快速理解项目的完成度与技术含量。</p>
+          <div class="spec-grid">
+            <div class="spec"><span>类型</span><strong>交互系统 / Web Demo</strong></div>
+            <div class="spec"><span>技术</span><strong>JavaScript / AI / UI</strong></div>
+            <div class="spec"><span>展示</span><strong>图片 / 视频 / 链接</strong></div>
+            <div class="spec"><span>价值</span><strong>体验创新</strong></div>
+          </div>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#detail-03">查看详情</a>
+            <a class="btn btn-ghost" href="#cover">回到顶部</a>
+          </div>
+          <div id="detail-03" class="detail-panel">
+            <strong>详情内容占位：</strong>这里可以扩展为完整案例研究，包括需求分析、设计方案、技术实现、测试过程、成果展示与反思。
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p><strong>Portfolio Website</strong><br>Designed for intelligent interaction, embedded development and creative technology projects.</p>
+  </footer>
+</body>
+</html>
