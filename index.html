@@ -843,45 +843,57 @@
     </section>
 
     <!-- 第 4 页：作品二 -->
-    <section id="project-02" class="page project-page">
-      <div class="container project-card">
-        <div class="project-media">
-          <div class="media-main">
-            <div>
-              <strong>作品主图占位</strong><br>
-              可放硬件结构图、交互流程图、实验照片
-            </div>
-          </div>
-          <div class="media-small-grid">
-            <div class="video-box">
-              <div><strong>视频占位</strong><br>项目演示 / 交互录屏</div>
-            </div>
-            <div class="link-box">
-              <div><strong>链接占位</strong><br>在线 Demo / 代码仓库</div>
-            </div>
-          </div>
+<section id="project-02" class="page project-page">
+  <div class="container project-card">
+    <div class="project-media">
+      <div class="media-main">
+        <img class="project-image" src="project2/cover.png" alt="情绪遗迹 Emotional Relics 项目封面">
+      </div>
+
+      <div class="media-small-grid">
+        <div class="video-box">
+          <video class="project-video" controls muted loop playsinline poster="project2/cover.png">
+            <source src="project2/demo.mp4" type="video/mp4">
+            当前浏览器不支持视频播放。
+          </video>
         </div>
-        <div class="project-content">
-          <div class="project-number">02</div>
-          <h3>作品名称二</h3>
-          <p class="project-text">这里填写第二个作品的概述。可以强调技术难点，例如数据采集、实时反馈、控制逻辑、硬件调试、交互体验优化等。</p>
-          <div class="spec-grid">
-            <div class="spec"><span>类型</span><strong>嵌入式开发</strong></div>
-            <div class="spec"><span>技术</span><strong>STM32 / Arduino / Sensor</strong></div>
-            <div class="spec"><span>输出</span><strong>硬件原型 / 演示视频</strong></div>
-            <div class="spec"><span>亮点</span><strong>实时交互反馈</strong></div>
-          </div>
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="#detail-02">查看详情</a>
-            <a class="btn btn-ghost" href="#project-03">下一个作品</a>
-          </div>
-          <div id="detail-02" class="detail-panel">
-            <strong>详情内容占位：</strong>这里可以添加系统架构图、硬件清单、关键代码片段、测试数据、视频链接和项目总结。
-          </div>
+
+        <div class="link-box playable-link">
+          <a class="play-link" href="project2/Emotional.html" target="_blank" rel="noopener">
+            <span>VIEW</span>
+            <strong>进入项目</strong>
+            <small>打开 HTML 交互页面</small>
+          </a>
         </div>
       </div>
-    </section>
+    </div>
 
+    <div class="project-content">
+      <div class="project-number">02</div>
+      <h3>情绪遗迹 Emotional Relics</h3>
+      <p class="project-text">
+        《情绪遗迹》是一套面向博物馆与展览场景的智能交互系统。观众佩戴皮电、肌电与二维位移感知设备，在参观过程中同步记录情绪唤醒、主动兴趣行为与空间轨迹，并在离场后生成一张抽象的个人“情绪遗迹图”。
+      </p>
+
+      <div class="spec-grid">
+        <div class="spec"><span>类型</span><strong>智能人机交互</strong></div>
+        <div class="spec"><span>技术</span><strong>GSR / EMG / XY</strong></div>
+        <div class="spec"><span>场景</span><strong>博物馆体验设计</strong></div>
+        <div class="spec"><span>输出</span><strong>数据生成艺术</strong></div>
+      </div>
+
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="project2/Emotional.html" target="_blank" rel="noopener">进入项目</a>
+        <a class="btn btn-ghost" href="#detail-02">查看详情</a>
+      </div>
+
+      <div id="detail-02" class="detail-panel">
+        <strong>项目说明：</strong>
+        项目核心并不是判断观众“开心或悲伤”，而是通过“情绪波动—兴趣动作—空间位置”的多模态证据，记录展览在人身上留下的体验痕迹。系统以 GSR 捕捉情绪波动，以 EMG 捕捉抬臂、指向、拍照等主动兴趣行为，以 XY 位移记录参观路径、停留与回访，并最终生成兼具纪念性、审美性和策展参考价值的个人情绪地图。
+      </div>
+    </div>
+  </div>
+</section>
     <!-- 第 5 页：作品三 -->
     <section id="project-03" class="page project-page">
       <div class="container project-card">
